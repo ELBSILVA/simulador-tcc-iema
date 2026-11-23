@@ -1,0 +1,18 @@
+SIMULADOR – TCC IEMA 2026 (funciona sem internet)
+
+1. Descompacte o zip (botão direito > Extrair tudo).
+2. Abra a pasta Simulador_TCC_IEMA_2026.
+3. Dê dois cliques em ABRIR_SIMULADOR.html (Google Chrome ou Edge).
+
+Na barra lateral (esquerda): escolha o programa (G1, G2, G3), quem está usando e a tela.
+Senha de todos os usuários de exemplo: 1234 • F8 encerra o simulador.
+
+APRESENTAÇÃO EM DUAS TELAS (projetor como tela estendida: tecla Windows + P > Estender)
+1. Clique em "Projetar na 2ª tela" e arraste a janela da plateia para o projetor.
+2. Clique em "Plateia em tela cheia" (ou clique uma vez na janela da plateia).
+3. A plateia vê a capa com a logo. "Iniciar" liga o tempo; a capa continua.
+4. "Demonstrar protótipo" troca a capa pelo protótipo, com transição.
+5. A tela 1 mostra a prévia do que a plateia vê, o resumo de cada tela e o tempo restante.
+
+Os dados ficam salvos só neste computador.
+Com internet, o simulador avisa quando houver uma versão nova para baixar.
