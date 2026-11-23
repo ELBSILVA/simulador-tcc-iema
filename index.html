@@ -129,6 +129,13 @@ body.proj #capa.vis{display:flex}
 .pvCapa{position:absolute;inset:44px 10px 10px;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(255,255,255,.96);border-radius:10px;z-index:3;color:#22252b;font-size:14px;text-align:center}
 .pvCapa img{max-width:60%;max-height:40%}
 body.capa .pvCapa{display:flex}
+#relGrande{position:absolute;inset:44px 0 0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:#111316;z-index:6;text-align:center;padding:20px}
+body.apresentando.capa #relGrande,body.apresentando.geral #relGrande{display:flex}
+#relGrande .q{padding:3vh 4vw;border-radius:26px;line-height:0}
+#relGrande .q svg{height:22vh;width:auto;max-width:100%}
+#relGrande .rr{font:700 13px "Segoe UI",sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:#9aa1ab}
+#relGrande .dec{font:600 2.6vh "Segoe UI",sans-serif;color:#c9ced6}#relGrande .dec b{font-size:3.6vh;color:#fff;letter-spacing:2px}
+#relGrande .info{font-size:15px;color:#9aa1ab;max-width:640px;line-height:1.5}#relGrande .info b{color:#eef0f3}
 #bTrans{width:100%;margin-top:10px;padding:11px;border-radius:10px;border:0;cursor:pointer;font-weight:700;font-size:15px;background:#1f9d55;color:#fff}
 #bTrans.voltar{background:#3a3f47}
 .pv{position:relative}
@@ -160,7 +167,7 @@ body.capa .pvCapa{display:flex}
 </aside>
 <main id="palco"></main>
 <section id="apres">
-  <div class="pv"><div class="pvTop"><i></i>Prévia ao vivo — clique, digite e role aqui que a plateia acompanha</div><div id="previa"></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
+  <div class="pv"><div class="pvTop"><i></i>Prévia ao vivo — clique, digite e role aqui que a plateia acompanha</div><div id="previa"></div><div id="relGrande"><div class="rr">Tempo restante</div><div class="q cr-verde" id="rgQ"></div><div class="dec">Tempo decorrido: <b id="rgDec">00:00:00</b></div><div class="info" id="rgInfo"></div></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
 </section>
   <aside id="dir" class="col">
     <div class="agora"><small id="aRot">Na tela da plateia agora</small><h2 id="aTit">—</h2><p id="aSub"></p><button id="bTrans" onclick="transmitir()">📺 Demonstrar protótipo</button></div>
@@ -337,6 +344,8 @@ function desenharApres() {
   document.getElementById('aSub').textContent = emDisp ? 'Aparelho do refeitório' : (i && i.perfil ? `${PERFIL[i.perfil] || i.perfil} • ${i.usuario}` : 'Ninguém entrou ainda');
   document.getElementById('aFala').textContent = FALA[a + ':' + tela] || FALA[a + ':'] || '';
   document.getElementById('bTrans').style.display = geral ? 'none' : '';
+  const rgi = document.getElementById('rgInfo'); if (rgi) rgi.innerHTML = geral ? 'A plateia está vendo a <b>abertura</b> (logos dos 3 projetos). Escolha o projeto na lateral.'
+    : `A plateia está vendo a <b>capa do ${NOME[a]}</b>. Quando chegar a hora da demonstração, clique em <b>📺 Demonstrar protótipo</b>.`;
   document.getElementById('aRot').textContent = document.body.classList.contains('apresentando') ? 'Na tela da plateia agora' : 'Na tela agora';
   if (geral) { document.getElementById('aTit').textContent = 'Abertura — TCC IEMA 2026'; document.getElementById('aSub').textContent = 'Logo do IEMA e as logos dos 3 projetos. Escolha o projeto na lateral.'; document.getElementById('aFala').textContent = 'Apresente o TCC: Design Thinking com problemas reais da escola, ligados aos ODS. Hoje, 3 projetos.'; return; }
   if (comCapa && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = `Capa — ${NOME[a]}`; document.getElementById('aSub').textContent = 'Logo do projeto + tempo. O protótipo está pronto por trás.'; }
@@ -366,16 +375,27 @@ function ligarInteracao(doc) {
   doc.addEventListener('wheel', e => { e.preventDefault(); e.stopPropagation(); interagir({ sim: 'rolar', x: e.clientX, y: e.clientY, dy: e.deltaY }); }, { capture: true, passive: false });
   doc.addEventListener('keydown', e => { if (e.key === 'F11' || e.key === 'F5') return; e.preventDefault(); e.stopPropagation(); interagir({ sim: 'tecla', key: e.key }); }, true);
 }
+let pvHead = '';
+const SEM_ANIM = '<style>*,*:before,*:after{animation:none!important;transition:none!important}</style>';
+function rolagem(doc, t) { doc.querySelectorAll('[data-sc]').forEach(x => x.scrollTop = +x.getAttribute('data-sc'));
+  (doc.scrollingElement || doc.documentElement).scrollTop = t.sy || 0; }
 function previa(d) {
   if (!document.body.classList.contains('apresentando')) return;
   pvUlt = Date.now();
-  if (d.k !== pvK) previaMontar(d.k);
+  if (d.k !== pvK) { previaMontar(d.k); pvHead = ''; }
   const fs = document.querySelectorAll('#pvDisp iframe'); if (fs.length < 2) return;
   const novo = fs[1 - pvAtivo], velho = fs[pvAtivo], t = d.simTela;
-  const html = t.html.replace(/<head[^>]*>/i, m => m + `<base href="${t.base}">`);
-  novo.onload = () => { try { const doc = novo.contentDocument; ligarInteracao(doc);
-      doc.querySelectorAll('[data-sc]').forEach(x => x.scrollTop = +x.getAttribute('data-sc'));
-      (doc.scrollingElement || doc.documentElement).scrollTop = t.sy || 0; } catch (x) {}
+  const mHead = t.html.match(/<head[^>]*>([\s\S]*?)<\/head>/i), head = mHead ? mHead[1] : '';
+  const mBody = t.html.match(/<body([^>]*)>([\s\S]*)<\/body>/i);
+  // caminho rápido: mesmo cabeçalho (estilos) → troca só o corpo, sem recarregar
+  if (head && head === pvHead && mBody) { try { const doc = velho.contentDocument;
+      const tmp = doc.createElement('div'); tmp.innerHTML = '<div ' + mBody[1] + '></div>';
+      const at = tmp.firstChild; [...doc.body.attributes].forEach(a => doc.body.removeAttribute(a.name)); [...at.attributes].forEach(a => doc.body.setAttribute(a.name, a.value));
+      const mHtml = t.html.match(/<html([^>]*)>/i); if (mHtml) { tmp.innerHTML = '<div ' + mHtml[1] + '></div>'; [...tmp.firstChild.attributes].forEach(a => doc.documentElement.setAttribute(a.name, a.value)); }
+      doc.body.innerHTML = mBody[2]; rolagem(doc, t); return; } catch (x) {} }
+  pvHead = head;
+  const html = t.html.replace(/<head[^>]*>/i, m => m + `<base href="${t.base}">` + SEM_ANIM);
+  novo.onload = () => { try { const doc = novo.contentDocument; ligarInteracao(doc); rolagem(doc, t); } catch (x) {}
     novo.style.visibility = 'visible'; velho.style.visibility = 'hidden'; pvAtivo = 1 - pvAtivo; };
   novo.srcdoc = html;
 }
@@ -450,6 +470,7 @@ function corDe(rest, tot) { const p = rest / tot; return p > .5 ? 'cr-verde' : p
 function cronoMostra() {
   const tot = total(), rest = tot - cT, c = document.getElementById('crono');
   c.innerHTML = seg7(mmss(Math.max(rest, 0))); c.className = 'crono ' + corDe(rest, tot);
+  const q = document.getElementById('rgQ'); if (q) { q.innerHTML = c.innerHTML; q.className = 'q ' + corDe(rest, tot); document.getElementById('rgDec').textContent = hhmmss(cT); }
   document.getElementById('decor').textContent = hhmmss(cT);
   if (projecao && !projecao.closed) projecao.postMessage({ simTempo: { rest, tot, dec: cT, vis: cI !== null || cT > 0 } }, '*');
 }
