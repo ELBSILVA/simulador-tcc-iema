@@ -91,6 +91,26 @@ body.proj .rot{display:none}
 #cortina{display:none;position:fixed;inset:0;z-index:50;background:rgba(10,11,13,.92);align-items:center;justify-content:center;text-align:center;cursor:pointer}
 #cortina div{max-width:620px;font-size:20px;line-height:1.5}#cortina b{color:#5cc8ff}
 body.proj #cortina.vis{display:flex}
+/* abertura: logo do IEMA em cima e as logos dos 3 projetos lado a lado */
+#abertura{position:fixed;top:0;bottom:0;right:0;left:300px;z-index:47;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6vh;background:radial-gradient(circle at 50% 35%,#ffffff,#eef1f5);transition:opacity .9s ease}
+body.geral #abertura{display:flex}#abertura.saindo{opacity:0}
+body.proj #abertura{left:0}
+#abertura .ie{height:16vh;max-width:40vw;object-fit:contain}
+#abertura .tri{display:flex;align-items:center;justify-content:center;width:92%;max-width:1500px}
+#abertura .tri .lg{flex:1;display:flex;flex-direction:column;align-items:center;gap:1.4vh;padding:0 2.2vw;border:0;background:none;cursor:pointer;border-radius:18px;transition:transform .2s,background .2s}
+body:not(.proj) #abertura .tri .lg:hover{background:rgba(13,154,216,.08);transform:translateY(-4px)}
+body.proj #abertura .tri .lg{cursor:default}
+#abertura .tri .lg img{width:100%;max-height:15vh;object-fit:contain}
+#abertura .tri .lg span{font:600 1.9vh "Segoe UI",sans-serif;color:#5b6270}
+#abertura .tri i{width:2px;align-self:stretch;background:#d3d8df;margin:1vh 0}
+#abertura .rod{font:600 2.1vh "Segoe UI",sans-serif;color:#5b6270;text-align:center;line-height:1.5}#abertura .rod b{color:#22252b;font-size:2.6vh}
+#abertura .faixa{position:absolute;bottom:0;left:0;right:0;height:1.2vh;background:linear-gradient(90deg,#3a3a3c 33%,#0d9ad8 33% 66%,#ee2d3d 66%)}
+body.apresentando #abertura{display:none!important}
+.pvGeral{position:absolute;inset:44px 10px 10px;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#fff;border-radius:10px;z-index:4;color:#22252b;font-size:14px;text-align:center}
+.pvGeral .tri{display:flex;gap:14px;align-items:center}.pvGeral .tri img{height:46px}
+body.apresentando.geral .pvGeral{display:flex}
+#bAbert{width:100%;margin-top:4px;background:#2a2e35;color:var(--tx);border:1px solid var(--linha);border-radius:10px;padding:8px;cursor:pointer;font-size:13px}
+#bAbert.on{background:var(--azul);border-color:var(--azul)}
 /* capa com a logo (antes de iniciar o tempo) */
 #capa{display:none;position:fixed;inset:0;z-index:45;flex-direction:column;align-items:center;justify-content:center;gap:34px;background:radial-gradient(circle at 50% 40%,#ffffff,#eef1f5);transition:opacity .9s ease,transform .9s ease}
 #capa.saindo{opacity:0;transform:scale(1.04)}
@@ -117,6 +137,7 @@ body.capa .pvCapa{display:flex}
 <aside id="lado">
   <div class="topo"><img src="logo_iema.png" alt="IEMA"><b>Simulador – TCC IEMA 2026<small>Protótipos dos 3 grupos • sem internet</small></b></div>
   <div class="rolo">
+    <button id="bAbert" onclick="abertura(true)">🏠 Abertura (logos dos 3 projetos)</button>
     <div class="tit">Programa</div>
     <div class="apps">
       <button data-app="organiza"><img src="Logo_IEMA_Organiza.png" alt="IEMA Organiza"><span>G1 • celular</span></button>
@@ -134,7 +155,7 @@ body.capa .pvCapa{display:flex}
 </aside>
 <main id="palco"></main>
 <section id="apres">
-  <div class="pv"><div class="pvTop"><i></i>Prévia — o que a plateia está vendo</div><div id="previa"></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
+  <div class="pv"><div class="pvTop"><i></i>Prévia — o que a plateia está vendo</div><div id="previa"></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
   <div class="col">
     <div class="agora"><small>Na tela da plateia agora</small><h2 id="aTit">—</h2><p id="aSub"></p><button id="bTrans" onclick="transmitir()">📺 Demonstrar protótipo</button></div>
     <div class="cx"><h3>O que mostrar / falar</h3><div class="fala" id="aFala"></div></div>
@@ -148,6 +169,11 @@ body.capa .pvCapa{display:flex}
     <div class="aviso">Troque programa, perfil e tela pela lateral. Para digitar ou clicar dentro do app, use o mouse na 2ª tela. <b>⏹ Encerrar projeção</b> volta para uma tela só.</div>
   </div>
 </section>
+<div id="abertura"><img class="ie" src="logo_iema.png" alt="IEMA">
+  <div class="tri"><button class="lg" onclick="escolher('organiza')"><img src="Logo_IEMA_Organiza.png" alt="IEMA Organiza"><span>Grupo 1 • Organização da Rotina Escolar</span></button><i></i>
+  <button class="lg" onclick="escolher('stocktech')"><img src="Logo_StockTech.png" alt="StockTech"><span>Grupo 2 • Controle do Estoque de Alimentos</span></button><i></i>
+  <button class="lg" onclick="escolher('ecofood')"><img src="Logo_EcoFood.png" alt="EcoFood"><span>Grupo 3 • Desperdício Zero</span></button></div>
+  <div class="rod"><b>TCC IEMA 2026</b><br>Design Thinking • ODS, Inovação e Empreendedorismo • IEMA Pleno Coroatá</div><div class="faixa"></div></div>
 <div id="capa" class="vis"><img class="ie" src="logo_iema.png" alt="IEMA"><img class="lg" id="capaLogo" src="Logo_IEMA_Organiza.png" alt=""><div class="gp" id="capaTxt"></div><div class="fx"></div></div>
 <div id="cronoP"></div>
 <div id="aviso"></div>
@@ -269,11 +295,12 @@ window.addEventListener('message', e => {
   if (d.simInfo) { for (const a of ['organiza','stocktech','ecofood']) if (e.source === frameDe(a)) { INFO[a] = d.simInfo; if (a === app) avisaControle(); } return; }
   if (d.simTempo && PROJ) { tempoPlateia(d.simTempo); return; }
   if (d.simCheia && PROJ) { entrarTelaCheia(); return; }
+  if ('simGeral' in d && PROJ) { aberturaVisual(d.simGeral); return; }
   if ('simCapa' in d && PROJ) { capaNaPlateia(d.simCapa); return; }
   if (d.simCmd && PROJ) { executar(d.simCmd); return; }                 // plateia recebe comando do apresentador
   if (d.simEstado && !PROJ) { receber(d.simEstado); return; }
   if (d.simTela) {}           // apresentador recebe o estado da plateia
-  if (d.simPronta && !PROJ && projecao) { projecao.postMessage({ simCmd: { cmd: 'app', app: EST.app } }, '*'); projecao.postMessage({ simCapa: comCapa }, '*'); cronoMostra(); }
+  if (d.simPronta && !PROJ && projecao) { projecao.postMessage({ simCmd: { cmd: 'app', app: EST.app } }, '*'); projecao.postMessage({ simCapa: comCapa }, '*'); projecao.postMessage({ simGeral: geral }, '*'); cronoMostra(); }
 });
 window.addEventListener('resize', () => ajustar(false));
 document.addEventListener('fullscreenchange', () => ajustar(false));
@@ -302,9 +329,11 @@ function desenharApres() {
   document.getElementById('aTit').textContent = `${NOME[a]} — ${nomeTela}`;
   document.getElementById('aSub').textContent = emDisp ? 'Aparelho do refeitório' : (i && i.perfil ? `${PERFIL[i.perfil] || i.perfil} • ${i.usuario}` : 'Ninguém entrou ainda');
   document.getElementById('aFala').textContent = FALA[a + ':' + tela] || FALA[a + ':'] || '';
+  document.getElementById('bTrans').style.display = geral ? 'none' : '';
+  if (geral && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = 'Abertura — TCC IEMA 2026'; document.getElementById('aSub').textContent = 'Logo do IEMA e as logos dos 3 projetos. Escolha o projeto na lateral.'; document.getElementById('aFala').textContent = 'Apresente o TCC: Design Thinking com problemas reais da escola, ligados aos ODS. Hoje, 3 projetos.'; return; }
   if (comCapa && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = `Capa — ${NOME[a]}`; document.getElementById('aSub').textContent = 'Logo do projeto + tempo. O protótipo está pronto por trás.'; }
 }
-document.querySelectorAll('.apps button').forEach(b => b.onclick = () => cmd({ cmd: 'app', app: b.dataset.app }));
+document.querySelectorAll('.apps button').forEach(b => b.onclick = () => { cmd({ cmd: 'app', app: b.dataset.app }); if (geral) abertura(false); });
 
 /* ================= PRÉVIA (espelho da tela da plateia) ================= */
 let pvK = null, pvAtivo = 0;
@@ -355,7 +384,7 @@ async function projetar() {
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // o palco desta janela é desligado: os programas passam a rodar só na janela da plateia
   Object.keys(criados).forEach(k => { criados[k].remove(); delete criados[k]; });
-  document.body.classList.add('apresentando'); comCapa = true; marcaCapa(); pvK = null; document.getElementById('previa').innerHTML = '';
+  document.body.classList.add('apresentando'); comCapa = true; geral = true; document.body.classList.add('geral'); document.getElementById('bAbert').classList.add('on'); marcaCapa(); pvK = null; document.getElementById('previa').innerHTML = '';
   const b = document.getElementById('bProj'); b.textContent = '⏹ Encerrar projeção'; b.classList.add('ativo');
   desenharApres();
   const vigia = setInterval(() => { if (!projecao || projecao.closed) { clearInterval(vigia); fimProjecao(); } }, 800);
@@ -364,6 +393,7 @@ function fimProjecao() {
   projecao = null; document.body.classList.remove('apresentando');
   const b = document.getElementById('bProj'); b.textContent = '📽 Projetar na 2ª tela'; b.classList.remove('ativo');
   app = EST.app; modo = EST.modo; mostrarPalco(); avisaControle();
+  if (geral) aberturaVisual(true); else document.body.classList.remove('geral');
 }
 function entrarTelaCheia() { if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }
 function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
@@ -372,6 +402,18 @@ function cheia() { if (!document.fullscreenElement) document.documentElement.req
 function plateiaCheia() { if (!projecao || projecao.closed) return;
   try { projecao.postMessage({ simCheia: true }, { targetOrigin: '*', delegate: 'fullscreen' }); }
   catch (e) { projecao.postMessage({ simCheia: true }, '*'); } }
+
+/* abertura (antes de escolher o projeto) */
+var geral = true;
+let abT = null;
+function aberturaVisual(on) { const a = document.getElementById('abertura'); clearTimeout(abT);
+  if (on) { document.body.classList.add('geral'); a.offsetWidth; a.classList.remove('saindo'); }
+  else { a.classList.add('saindo'); abT = setTimeout(() => { document.body.classList.remove('geral'); a.classList.remove('saindo'); }, 900); }
+  const b = document.getElementById('bAbert'); if (b) b.classList.toggle('on', on); }
+function abertura(on) { geral = on; if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
+  if (projecao && !projecao.closed) { projecao.postMessage({ simGeral: on }, '*'); document.body.classList.toggle('geral', on); document.getElementById('bAbert').classList.toggle('on', on); desenharApres(); }
+  else aberturaVisual(on); }
+function escolher(a) { if (PROJ) return; cmd({ cmd: 'app', app: a }); abertura(false); }
 
 /* capa x protótipo na plateia */
 function transmitir() { plateiaCheia(); comCapa = !comCapa; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: comCapa }, '*'); }
@@ -427,9 +469,9 @@ if (!PROJ && navigator.onLine && !BUILD.startsWith('__')) {
 }
 
 /* início */
-if (PROJ) { capaPlateia(); document.body.classList.add('comCapa');
+if (PROJ) { capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral');
   ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => entrarTelaCheia(), true)); document.getElementById('palco').addEventListener('dblclick', e => { if (e.target.id === 'palco') entrarTelaCheia(); }); mostrarPalco(); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); } catch (e) {} }
-else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); }
+else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); }
 </script>
 </body>
 </html>
