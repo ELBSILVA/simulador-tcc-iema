@@ -63,7 +63,8 @@ body.apresentando #apres{display:flex}body.apresentando #palco{display:none}
 @keyframes pisca{50%{opacity:.35}}
 #previa{flex:1;position:relative;overflow:hidden}
 #previa .disp{display:block}
-#previa .tela iframe{position:absolute;left:0;bottom:0;pointer-events:none}
+#previa .tela iframe{position:absolute;left:0;bottom:0}
+#previa .tela{cursor:pointer}
 #apres .col{width:360px;flex:none;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 #apres .agora{background:#22262c;border:1px solid var(--linha);border-left:8px solid var(--cor);border-radius:14px;padding:14px 16px}
 #apres .agora small{color:var(--mu);text-transform:uppercase;letter-spacing:.8px;font-size:11px;font-weight:700}
@@ -155,7 +156,7 @@ body.capa .pvCapa{display:flex}
 </aside>
 <main id="palco"></main>
 <section id="apres">
-  <div class="pv"><div class="pvTop"><i></i>Prévia — o que a plateia está vendo</div><div id="previa"></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
+  <div class="pv"><div class="pvTop"><i></i>Prévia ao vivo — clique, digite e role aqui que a plateia acompanha</div><div id="previa"></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
   <div class="col">
     <div class="agora"><small>Na tela da plateia agora</small><h2 id="aTit">—</h2><p id="aSub"></p><button id="bTrans" onclick="transmitir()">📺 Demonstrar protótipo</button></div>
     <div class="cx"><h3>O que mostrar / falar</h3><div class="fala" id="aFala"></div></div>
@@ -166,7 +167,7 @@ body.capa .pvCapa{display:flex}
       <button onclick="cronoIni()">▶ Iniciar</button><button onclick="cronoPausa()">⏸ Pausar</button><button onclick="cronoZera()">↺ Zerar</button></div>
     <div class="cx" id="comoProj" style="border-left:6px solid var(--azul)"><h3>Como projetar</h3><div style="font-size:14.5px;line-height:1.55">1. Arraste a <b>janela da plateia</b> para o projetor (2ª tela).<br>2. Clique em <b>⛶ Plateia em tela cheia</b> abaixo — ou clique uma vez na janela da plateia — e ela entra em tela cheia.<br>3. Controle tudo por aqui, pela lateral.</div>
       <button style="margin-top:8px" onclick="plateiaCheia()">⛶ Plateia em tela cheia</button><button style="margin-top:8px" onclick="this.parentNode.style.display='none'">✓ Entendi</button></div>
-    <div class="aviso">Troque programa, perfil e tela pela lateral. Para digitar ou clicar dentro do app, use o mouse na 2ª tela. <b>⏹ Encerrar projeção</b> volta para uma tela só.</div>
+    <div class="aviso">Troque programa, perfil e tela pela lateral. Você também pode clicar, digitar e rolar direto na prévia — a plateia acompanha. <b>⏹ Encerrar projeção</b> volta para uma tela só.</div>
   </div>
 </section>
 <div id="abertura"><img class="ie" src="logo_iema.png" alt="IEMA">
@@ -293,6 +294,7 @@ window.addEventListener('message', e => {
   if (d.ecofood === 'abrir' && DISP[d.modo]) { executar({ cmd: 'modo', modo: d.modo }); return; }
   if (d.simTela) { if (PROJ && e.source === frameDe(chave())) { try { window.opener.postMessage({ simTela: d.simTela, k: chave() }, '*'); } catch (x) {} } else if (!PROJ) previa(d); return; }
   if (d.simInfo) { for (const a of ['organiza','stocktech','ecofood']) if (e.source === frameDe(a)) { INFO[a] = d.simInfo; if (a === app) avisaControle(); } return; }
+  if (d.simInput && PROJ) { const w = frameDe(chave()); w && w.postMessage(d.simInput, '*'); return; }
   if (d.simTempo && PROJ) { tempoPlateia(d.simTempo); return; }
   if (d.simCheia && PROJ) { entrarTelaCheia(); return; }
   if ('simGeral' in d && PROJ) { aberturaVisual(d.simGeral); return; }
@@ -349,6 +351,15 @@ function previaAjustar() {
   const s = Math.min((r.width - 24) / el.offsetWidth, (r.height - 24) / el.offsetHeight);
   el.style.transform = `translate(-50%,-50%) scale(${s})`;
 }
+function interagir(m) { if (projecao && !projecao.closed) projecao.postMessage({ simInput: m }, '*'); }
+function ligarInteracao(doc) {
+  if (!doc || doc._lig) return; doc._lig = true;
+  doc.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); interagir({ sim: 'clique', x: e.clientX, y: e.clientY }); }, true);
+  doc.addEventListener('submit', e => e.preventDefault(), true);
+  ['input', 'change', 'keyup', 'keypress', 'mousedown', 'mouseup', 'pointerdown', 'pointerup', 'dblclick'].forEach(t => doc.addEventListener(t, e => e.stopPropagation(), true));
+  doc.addEventListener('wheel', e => { e.preventDefault(); e.stopPropagation(); interagir({ sim: 'rolar', x: e.clientX, y: e.clientY, dy: e.deltaY }); }, { capture: true, passive: false });
+  doc.addEventListener('keydown', e => { if (e.key === 'F11' || e.key === 'F5') return; e.preventDefault(); e.stopPropagation(); interagir({ sim: 'tecla', key: e.key }); }, true);
+}
 function previa(d) {
   if (!document.body.classList.contains('apresentando')) return;
   pvUlt = Date.now();
@@ -356,7 +367,7 @@ function previa(d) {
   const fs = document.querySelectorAll('#pvDisp iframe'); if (fs.length < 2) return;
   const novo = fs[1 - pvAtivo], velho = fs[pvAtivo], t = d.simTela;
   const html = t.html.replace(/<head[^>]*>/i, m => m + `<base href="${t.base}">`);
-  novo.onload = () => { try { const doc = novo.contentDocument;
+  novo.onload = () => { try { const doc = novo.contentDocument; ligarInteracao(doc);
       doc.querySelectorAll('[data-sc]').forEach(x => x.scrollTop = +x.getAttribute('data-sc'));
       (doc.scrollingElement || doc.documentElement).scrollTop = t.sy || 0; } catch (x) {}
     novo.style.visibility = 'visible'; velho.style.visibility = 'hidden'; pvAtivo = 1 - pvAtivo; };
