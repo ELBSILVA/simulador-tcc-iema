@@ -65,16 +65,19 @@ body.apresentando #apres{display:flex}body.apresentando #palco{display:none}
 #previa .disp{display:block}
 #previa .tela iframe{position:absolute;left:0;bottom:0}
 #previa .tela{cursor:pointer}
-#apres .col{width:360px;flex:none;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-#apres .agora{background:#22262c;border:1px solid var(--linha);border-left:8px solid var(--cor);border-radius:14px;padding:14px 16px}
-#apres .agora small{color:var(--mu);text-transform:uppercase;letter-spacing:.8px;font-size:11px;font-weight:700}
-#apres .agora h2{margin:6px 0 2px;font-size:22px;line-height:1.25}#apres .agora p{margin:0;color:#c9ced6;font-size:14.5px}
-#apres .cx{background:#22262c;border:1px solid var(--linha);border-radius:14px;padding:14px 16px}
-#apres .cx h3{margin:0 0 8px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px}
-#apres .fala{font-size:18px;line-height:1.5}
-#apres .crono{margin:6px 0 8px;padding:12px 10px;border-radius:12px;text-align:center;line-height:0}#apres .crono svg{height:52px;width:auto}
-#apres .decor{font-size:14px;color:var(--mu);margin-bottom:10px;text-align:center}#apres .decor b{color:var(--tx);font-size:18px;letter-spacing:1px}
-#apres .dur{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}#apres .dur input{width:64px;background:#15171a;color:var(--tx);border:1px solid var(--linha);border-radius:8px;padding:5px 8px;font-size:14px}
+#dir{position:absolute;top:0;right:0;bottom:0;width:360px;padding:18px 16px 18px 0;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+body.proj #dir{display:none}
+#palco{right:360px!important}#apres{right:360px!important}body.proj #palco{right:0!important}
+body:not(.apresentando) #comoProj,body:not(.apresentando) #bTrans{display:none!important}
+#dir .agora{background:#22262c;border:1px solid var(--linha);border-left:8px solid var(--cor);border-radius:14px;padding:14px 16px}
+#dir .agora small{color:var(--mu);text-transform:uppercase;letter-spacing:.8px;font-size:11px;font-weight:700}
+#dir .agora h2{margin:6px 0 2px;font-size:22px;line-height:1.25}#dir .agora p{margin:0;color:#c9ced6;font-size:14.5px}
+#dir .cx{background:#22262c;border:1px solid var(--linha);border-radius:14px;padding:14px 16px}
+#dir .cx h3{margin:0 0 8px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px}
+#dir .fala{font-size:18px;line-height:1.5}
+#dir .crono{margin:6px 0 8px;padding:12px 10px;border-radius:12px;text-align:center;line-height:0}#dir .crono svg{height:52px;width:auto}
+#dir .decor{font-size:14px;color:var(--mu);margin-bottom:10px;text-align:center}#dir .decor b{color:var(--tx);font-size:18px;letter-spacing:1px}
+#dir .dur{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}#dir .dur input{width:64px;background:#15171a;color:var(--tx);border:1px solid var(--linha);border-radius:8px;padding:5px 8px;font-size:14px}
 .cr-verde{background:#1f9d55;color:#fff}.cr-amarelo{background:#f1c40f;color:#2a2100}.cr-vermelho{background:#e74c3c;color:#fff}
 .cr-pisca{animation:crpisca .8s steps(2) infinite}@keyframes crpisca{50%{opacity:.25}}
 #cronoP{display:none;position:fixed;bottom:18px;left:18px;z-index:60;gap:12px;align-items:stretch}
@@ -83,8 +86,8 @@ body.proj #cronoP.vis{display:flex}
 #cronoP .rel small{font:700 11px/1 "Segoe UI",sans-serif;letter-spacing:1px;text-transform:uppercase;opacity:.85}
 #cronoP svg{height:56px;width:auto;display:block}
 #cronoP .dec{background:#111316;color:#5cc8ff;border:1px solid #2a2e35}
-#apres .cx button{background:#2a2e35;color:var(--tx);border:1px solid var(--linha);border-radius:9px;padding:7px 10px;cursor:pointer;margin-right:4px}
-#apres .aviso{color:var(--mu);font-size:12.5px;line-height:1.5}
+#dir .cx button{background:#2a2e35;color:var(--tx);border:1px solid var(--linha);border-radius:9px;padding:7px 10px;cursor:pointer;margin-right:4px}
+#dir .aviso{color:var(--mu);font-size:12.5px;line-height:1.5}
 /* ===== janela da plateia (2ª tela): só o aparelho ===== */
 body.proj #lado,body.proj #apres{display:none}
 body.proj #palco{left:0}
@@ -93,9 +96,10 @@ body.proj .rot{display:none}
 #cortina div{max-width:620px;font-size:20px;line-height:1.5}#cortina b{color:#5cc8ff}
 body.proj #cortina.vis{display:flex}
 /* abertura: logo do IEMA em cima e as logos dos 3 projetos lado a lado */
-#abertura{position:fixed;top:0;bottom:0;right:0;left:300px;z-index:47;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6vh;background:radial-gradient(circle at 50% 35%,#ffffff,#eef1f5);transition:opacity .9s ease}
+#abertura{position:fixed;top:0;bottom:0;right:360px;left:300px;z-index:47;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6vh;background:radial-gradient(circle at 50% 35%,#ffffff,#eef1f5);transition:opacity .9s ease}
 body.geral #abertura{display:flex}#abertura.saindo{opacity:0}
-body.proj #abertura{left:0}
+body.proj #abertura{left:0;right:0}
+@media (max-width:1100px){body:not(.proj) #abertura{right:280px}}
 #abertura .ie{height:16vh;max-width:40vw;object-fit:contain}
 #abertura .tri{display:flex;align-items:center;justify-content:center;width:92%;max-width:1500px}
 #abertura .tri .lg{flex:1;display:flex;flex-direction:column;align-items:center;gap:1.4vh;padding:0 2.2vw;border:0;background:none;cursor:pointer;border-radius:18px;transition:transform .2s,background .2s}
@@ -130,7 +134,7 @@ body.capa .pvCapa{display:flex}
 .pv{position:relative}
 #aviso{display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:9;background:#fff3c4;color:#3a2a00;border-radius:12px;padding:10px 16px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 #aviso a{color:#0b6fa0;font-weight:700}#aviso button{margin-left:10px;border:0;background:transparent;cursor:pointer;font-size:16px}
-@media (max-width:1100px){#apres .col{width:280px}}
+@media (max-width:1100px){#dir{width:280px}#palco,#apres{right:280px!important}}
 @media (max-width:820px){#lado{width:240px}#palco,#apres{left:240px}}
 </style>
 </head>
@@ -157,8 +161,9 @@ body.capa .pvCapa{display:flex}
 <main id="palco"></main>
 <section id="apres">
   <div class="pv"><div class="pvTop"><i></i>Prévia ao vivo — clique, digite e role aqui que a plateia acompanha</div><div id="previa"></div><div class="pvGeral"><img src="logo_iema.png" style="height:54px" alt=""><div class="tri"><img src="Logo_IEMA_Organiza.png" alt=""><img src="Logo_StockTech.png" alt=""><img src="Logo_EcoFood.png" alt=""></div><div><b>A plateia está vendo a abertura.</b><br>Escolha o projeto na lateral para ir à capa dele.</div></div><div class="pvCapa"><img id="pvCapaLogo" src="Logo_IEMA_Organiza.png" alt=""><div><b>A plateia está vendo a capa (logo do projeto) e o tempo.</b><br>Quando chegar a hora da demonstração, clique em 📺 Demonstrar protótipo.</div></div></div>
-  <div class="col">
-    <div class="agora"><small>Na tela da plateia agora</small><h2 id="aTit">—</h2><p id="aSub"></p><button id="bTrans" onclick="transmitir()">📺 Demonstrar protótipo</button></div>
+</section>
+  <aside id="dir" class="col">
+    <div class="agora"><small id="aRot">Na tela da plateia agora</small><h2 id="aTit">—</h2><p id="aSub"></p><button id="bTrans" onclick="transmitir()">📺 Demonstrar protótipo</button></div>
     <div class="cx"><h3>O que mostrar / falar</h3><div class="fala" id="aFala"></div></div>
     <div class="cx"><h3>Tempo de apresentação</h3>
       <div class="dur">Duração: <input id="durMin" type="number" min="1" max="60" value="10" onchange="cronoZera()"> min <span style="margin-left:auto">regressivo</span></div>
@@ -168,8 +173,8 @@ body.capa .pvCapa{display:flex}
     <div class="cx" id="comoProj" style="border-left:6px solid var(--azul)"><h3>Como projetar</h3><div style="font-size:14.5px;line-height:1.55">1. Arraste a <b>janela da plateia</b> para o projetor (2ª tela).<br>2. Clique em <b>⛶ Plateia em tela cheia</b> abaixo — ou clique uma vez na janela da plateia — e ela entra em tela cheia.<br>3. Controle tudo por aqui, pela lateral.</div>
       <button style="margin-top:8px" onclick="plateiaCheia()">⛶ Plateia em tela cheia</button><button style="margin-top:8px" onclick="this.parentNode.style.display='none'">✓ Entendi</button></div>
     <div class="aviso">Troque programa, perfil e tela pela lateral. Você também pode clicar, digitar e rolar direto na prévia — a plateia acompanha. <b>⏹ Encerrar projeção</b> volta para uma tela só.</div>
-  </div>
-</section>
+  </aside>
+
 <div id="abertura"><img class="ie" src="logo_iema.png" alt="IEMA">
   <div class="tri"><button class="lg" onclick="escolher('organiza')"><img src="Logo_IEMA_Organiza.png" alt="IEMA Organiza"><span>Grupo 1 • Organização da Rotina Escolar</span></button><i></i>
   <button class="lg" onclick="escolher('stocktech')"><img src="Logo_StockTech.png" alt="StockTech"><span>Grupo 2 • Controle do Estoque de Alimentos</span></button><i></i>
@@ -332,7 +337,8 @@ function desenharApres() {
   document.getElementById('aSub').textContent = emDisp ? 'Aparelho do refeitório' : (i && i.perfil ? `${PERFIL[i.perfil] || i.perfil} • ${i.usuario}` : 'Ninguém entrou ainda');
   document.getElementById('aFala').textContent = FALA[a + ':' + tela] || FALA[a + ':'] || '';
   document.getElementById('bTrans').style.display = geral ? 'none' : '';
-  if (geral && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = 'Abertura — TCC IEMA 2026'; document.getElementById('aSub').textContent = 'Logo do IEMA e as logos dos 3 projetos. Escolha o projeto na lateral.'; document.getElementById('aFala').textContent = 'Apresente o TCC: Design Thinking com problemas reais da escola, ligados aos ODS. Hoje, 3 projetos.'; return; }
+  document.getElementById('aRot').textContent = document.body.classList.contains('apresentando') ? 'Na tela da plateia agora' : 'Na tela agora';
+  if (geral) { document.getElementById('aTit').textContent = 'Abertura — TCC IEMA 2026'; document.getElementById('aSub').textContent = 'Logo do IEMA e as logos dos 3 projetos. Escolha o projeto na lateral.'; document.getElementById('aFala').textContent = 'Apresente o TCC: Design Thinking com problemas reais da escola, ligados aos ODS. Hoje, 3 projetos.'; return; }
   if (comCapa && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = `Capa — ${NOME[a]}`; document.getElementById('aSub').textContent = 'Logo do projeto + tempo. O protótipo está pronto por trás.'; }
 }
 document.querySelectorAll('.apps button').forEach(b => b.onclick = () => { cmd({ cmd: 'app', app: b.dataset.app }); if (geral) abertura(false); });
