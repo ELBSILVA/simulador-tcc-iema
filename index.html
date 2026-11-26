@@ -283,6 +283,21 @@ body.principalCheia #bGuiaToggle{display:inline-block}
 body.principalCheia:not(.guiaAberto) #guiaRapido,body.principalCheia:not(.guiaAberto) #guiaDetalhe{display:none!important}
 body.principalCheia:not(.guiaAberto) #palco{left:0!important;right:0!important;bottom:0!important;top:46px!important}
 body.principalCheia.guiaAberto #bGuiaToggle{background:#344155;border-color:#64748b}
+/* Navegação e cola independentes, ambas recolhíveis. */
+#bColaToggle{display:none}
+body.principalCheia #bColaToggle{display:inline-block}
+body.principalCheia #guiaRapido{display:none!important}
+body.principalCheia #guiaDetalhe{display:none!important}
+body.principalCheia.guiaAberto #guiaRapido{display:block!important}
+body.principalCheia.colaAberta #guiaDetalhe{display:block!important}
+body.principalCheia.colaAberta #bColaToggle{background:#344155;border-color:#64748b}
+body.principalCheia[data-guia="cel"] #palco{left:0!important;right:0!important;bottom:0!important}
+body.principalCheia[data-guia="cel"].guiaAberto #palco{left:calc(clamp(205px,25vw,340px) + 20px)!important}
+body.principalCheia[data-guia="cel"].colaAberta #palco{right:calc(clamp(205px,25vw,340px) + 20px)!important}
+body.principalCheia[data-guia="pc"] #palco{bottom:0!important}
+body.principalCheia[data-guia="pc"].guiaAberto #palco,body.principalCheia[data-guia="pc"].colaAberta #palco{bottom:clamp(190px,30vh,285px)!important}
+body.principalCheia[data-guia="pc"].colaAberta:not(.guiaAberto) #guiaDetalhe,body.principalCheia[data-guia="pc"].guiaAberto:not(.colaAberta) #guiaRapido{left:10px;right:10px;width:auto}
+@media(max-width:800px){body.principalCheia[data-guia="cel"].guiaAberto #palco,body.principalCheia[data-guia="cel"].colaAberta #palco{left:0!important;right:0!important;bottom:230px!important}body.principalCheia[data-guia="cel"].colaAberta:not(.guiaAberto) #guiaDetalhe,body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #guiaRapido{left:6px;right:6px;width:auto}#topoProt button{font-size:11px;padding:6px 8px}}
 </style>
 </head>
 <body>
@@ -310,7 +325,7 @@ body.principalCheia.guiaAberto #bGuiaToggle{background:#344155;border-color:#647
   </div>
   <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
-<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido guiaDetalhe" onclick="alternarGuia()">☰ Menu de demonstração</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>O que mostrar</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>O que esta função faz</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>Na demonstração</h4><p id="guiaAcao"></p></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
+<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido" onclick="alternarGuia()">☰ Menu de demonstração</button><button id="bColaToggle" type="button" aria-expanded="false" aria-controls="guiaDetalhe" onclick="definirCola(!document.body.classList.contains('colaAberta'))">▤ Cola das telas</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>O que mostrar</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>O que esta função faz</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>Na demonstração</h4><p id="guiaAcao"></p></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
 <div id="barraDemonstracao" role="toolbar" aria-label="Controles da demonstração">
  <div class="barraGrupo"><span>Exibição na 2ª tela</span><div class="barraBotoes"><button id="bCapaProjeto" onclick="mostrarCapaProjeto()" disabled>▧ Capa</button><button id="bDemoProjeto" onclick="mostrarDemoProjeto()" disabled>▶ Protótipo</button></div></div>
  <div class="barraGrupo"><span>Orientação da 2ª tela</span><div class="barraBotoes" role="group" aria-label="Orientação da segunda tela"><button type="button" data-orientacao="retrato" aria-pressed="true" onclick="definirOrientacao('retrato')">▯ Retrato</button><button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button></div></div>
@@ -536,7 +551,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126r', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126s', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -593,9 +608,10 @@ requestAnimationFrame(()=>ajustar(false));}
 
 function definirGuia(on){if(PROJ)return;document.body.classList.toggle('guiaAberto',!!on);const b=document.getElementById('bGuiaToggle');b.textContent=on?'✕ Ocultar menu':'☰ Menu de demonstração';b.setAttribute('aria-expanded',String(!!on));if(on){guiaAssinatura='';atualizarGuia();}requestAnimationFrame(()=>ajustar(false));}
 function alternarGuia(){definirGuia(!document.body.classList.contains('guiaAberto'));}
+function definirCola(on){if(PROJ)return;document.body.classList.toggle('colaAberta',!!on);const b=document.getElementById('bColaToggle');b.textContent=on?'✕ Ocultar cola':'▤ Cola das telas';b.setAttribute('aria-expanded',String(!!on));if(on){guiaAssinatura='';atualizarGuia();}requestAnimationFrame(()=>ajustar(false));}
 let principalFullNativo=false;
-function cheiaPrincipal(){if(PROJ||geral)return;document.body.classList.add('principalCheia');definirGuia(false);guiaAssinatura='';atualizarGuia();requestAnimationFrame(()=>ajustar(false));if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen({navigationUI:'hide'}).then(()=>{principalFullNativo=true;}).catch(()=>{});}}
-function voltarMenuPrincipal(){if(PROJ)return;document.body.classList.remove('principalCheia');definirGuia(false);principalFullNativo=false;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});requestAnimationFrame(()=>ajustar(false));}
+function cheiaPrincipal(){if(PROJ||geral)return;document.body.classList.add('principalCheia');definirGuia(false);definirCola(false);guiaAssinatura='';atualizarGuia();requestAnimationFrame(()=>ajustar(false));if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen({navigationUI:'hide'}).then(()=>{principalFullNativo=true;}).catch(()=>{});}}
+function voltarMenuPrincipal(){if(PROJ)return;document.body.classList.remove('principalCheia');definirGuia(false);definirCola(false);principalFullNativo=false;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});requestAnimationFrame(()=>ajustar(false));}
 document.addEventListener('fullscreenchange',()=>{if(!PROJ&&document.body.classList.contains('principalCheia')&&document.fullscreenElement)principalFullNativo=true;else if(!PROJ&&principalFullNativo&&!document.fullscreenElement)voltarMenuPrincipal();});
 document.addEventListener('keydown',e=>{if(!PROJ&&e.key==='Escape'&&document.body.classList.contains('principalCheia'))voltarMenuPrincipal();});
 
