@@ -340,7 +340,7 @@ window.addEventListener('message',e=>{
  if(PROJ){
   if(e.source!==window.opener)return;
   if(d.simMirror){receberEspelho(d.simMirror);return;}
-  if(d.simMeta){const st=d.simMeta;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;capaPlateia();}return;}
+  if(d.simApresentacao){const st=d.simApresentacao;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;geral=!!st.geral;comCapa=!!st.capa;capaPlateia();aberturaVisual(geral);capaNaPlateia(comCapa);if(!geral&&comCapa){clearTimeout(abT);document.body.classList.remove('geral');document.getElementById('abertura').classList.remove('saindo');}}return;} if(d.simMeta){const st=d.simMeta;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;capaPlateia();}return;}
   if(d.simTempo){tempoPlateia(d.simTempo);return;}
   if(d.simCheia){entrarTelaCheia();return;}
   if('simGeral' in d){aberturaVisual(d.simGeral);return;}
@@ -395,7 +395,7 @@ document.querySelectorAll('.apps button').forEach(b => b.onclick = () => escolhe
 /* Espelho passivo: nenhum aplicativo ou script é executado na segunda janela. */
 let mirrorK=null,mirrorFrame=null,mirrorHead='',mirrorPending=null,mirrorLoading=false;
 function pedirEspelho(){if(PROJ||!projecao||projecao.closed)return;let enviados=0;for(const [k,el] of Object.entries(criados)){const w=el?.querySelector('iframe')?.contentWindow;if(w){w.postMessage({sim:'espelho',on:k===chave()},'*');if(k===chave())enviados++;}}if(!enviados)console.warn('Simulador: aplicativo principal ainda não está pronto para espelhamento.');}
-function enviarEstadoPlateia(){if(!projecao||projecao.closed)return;projecao.postMessage({simMeta:estado()},'*');projecao.postMessage({simGeral:geral},'*');projecao.postMessage({simCapa:comCapa},'*');}
+function enviarEstadoPlateia(){if(!projecao||projecao.closed)return;projecao.postMessage({simApresentacao:{...estado(),geral,capa:comCapa}},'*');}
 function montarEspelho(k){const el=document.createElement('div');el.className='disp vis '+DISP[k].tipo;el.innerHTML=moldura(k,`<iframe sandbox="allow-same-origin" tabindex="-1" aria-hidden="true" width="${DISP[k].w}" height="${altApp(k)}" style="pointer-events:none"></iframe>`);document.getElementById('palco').replaceChildren(el);for(const j of Object.keys(criados))delete criados[j];criados[k]=el;mirrorK=k;mirrorFrame=el.querySelector('iframe');mirrorHead='';mirrorLoading=false;mirrorPending=null;relogio();requestAnimationFrame(()=>ajustar(false));}
 function aplicarRolagem(doc,t){doc.querySelectorAll('[data-sc],[data-sx]').forEach(el=>{el.scrollTop=Number(el.getAttribute('data-sc'))||0;el.scrollLeft=Number(el.getAttribute('data-sx'))||0;});const root=doc.scrollingElement||doc.documentElement;root.scrollTop=t.sy||0;root.scrollLeft=t.sx||0;}
 function receberEspelho(msg){if(!PROJ||!DISP[msg.k]||!msg.t?.html)return;const k=msg.k,t=msg.t;if(mirrorK!==k)montarEspelho(k);if(mirrorLoading){mirrorPending=msg;return;}const frame=mirrorFrame;const parsed=new DOMParser().parseFromString(t.html,'text/html');parsed.querySelectorAll('script,iframe,object,embed,meta[http-equiv="refresh"]').forEach(n=>n.remove());parsed.querySelectorAll('*').forEach(n=>{for(const at of [...n.attributes])if(/^on/i.test(at.name))n.removeAttribute(at.name);});const head=parsed.head.innerHTML;
@@ -414,7 +414,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126f', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126g', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -444,7 +444,7 @@ function aberturaVisual(on) { const a = document.getElementById('abertura'); cle
 function abertura(on) { geral = on;if(on&&!PROJ)abrirEtapa(1); if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
   if (projecao && !projecao.closed) { projecao.postMessage({ simGeral: on }, '*'); aberturaVisual(on); document.getElementById('bAbert').classList.toggle('on', on); desenharApres(); }
   else aberturaVisual(on); }
-function escolher(a) { if (PROJ) return; cmd({cmd:'app',app:a});abertura(false);comCapa=true;marcaCapa();enviarEstadoPlateia();pedirEspelho();atualizarResumoMenu();abrirEtapa(projecao&&!projecao.closed?3:2); }
+function escolher(a) { if(PROJ||!NOME[a])return;geral=false;comCapa=true;cmd({cmd:'app',app:a});aberturaVisual(false);marcaCapa();enviarEstadoPlateia();pedirEspelho();atualizarResumoMenu();abrirEtapa(projecao&&!projecao.closed?3:2); }
 function mostrarCapaProjeto(){if(PROJ||geral)return;comCapa=true;marcaCapa();enviarEstadoPlateia();}
 function mostrarDemoProjeto(){if(PROJ||geral)return;comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();abrirEtapa(3);}
 
