@@ -208,7 +208,7 @@ body.proj{background:#090b0e}
 body.proj #palco,body.proj #abertura,body.proj #capa{
  position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
  width:var(--projW,100vw)!important;height:var(--projH,100vh)!important;
- transform:translate(-50%,-50%)!important;overflow:hidden;
+ transform:translate(-50%,-50%) rotate(var(--projGiro,0deg))!important;transform-origin:center center!important;overflow:hidden;
 }
 body.proj #palco{background:#11151c}
 body.proj #abertura,body.proj #capa{container-type:size}
@@ -236,6 +236,10 @@ body.proj[data-orientacao="retrato"] #capa .ie{height:8cqh;max-width:55cqw}
 body.proj[data-orientacao="retrato"] #capa .lg{max-width:86cqw;max-height:28cqh}
 body.proj[data-orientacao="retrato"] #capa .gp{font-size:2cqh}
 body.proj[data-orientacao="retrato"] #capa .gp b{font-size:3cqh}
+/* A orientação gira o palco inteiro, inclusive a capa e a abertura. */
+body.proj #cronoP{position:fixed;left:50%;top:50%;bottom:auto;right:auto;width:var(--projW,100vw);height:var(--projH,100vh);transform:translate(-50%,-50%) rotate(var(--projGiro,0deg));transform-origin:center;align-items:flex-end;justify-content:flex-start;padding:18px;pointer-events:none}
+body.proj #cronoP .rel{flex:none}
+body.proj #capa.saindo{opacity:0}
 </style>
 </head>
 <body>
@@ -347,7 +351,7 @@ let orientacaoPlateia='retrato';
 function definirOrientacao(o){if(PROJ||!['auto','retrato','paisagem'].includes(o))return;orientacaoPlateia=o;atualizarOrientacao();if(projecao&&!projecao.closed)projecao.postMessage({simOrientacao:o},'*');}
 function atualizarOrientacao(){document.querySelectorAll('[data-orientacao]').forEach(b=>{const on=b.dataset.orientacao===orientacaoPlateia;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));});}
 function aplicarOrientacao(o){if(!PROJ||!['auto','retrato','paisagem'].includes(o))return;orientacaoPlateia=o;dimensionarProjecao();ajustar(false);}
-function dimensionarProjecao(){if(!PROJ)return;const o=orientacaoPlateia==='auto'?(retrato(chave())?'retrato':'paisagem'):orientacaoPlateia;document.body.dataset.orientacao=o;const ratio=o==='retrato'?9/16:16/9;const w=Math.min(innerWidth,innerHeight*ratio),h=w/ratio;document.body.style.setProperty('--projW',w+'px');document.body.style.setProperty('--projH',h+'px');}
+function dimensionarProjecao(){if(!PROJ)return;const o=orientacaoPlateia==='auto'?(retrato(chave())?'retrato':'paisagem'):orientacaoPlateia;const vertical=o==='retrato',fisicoVertical=innerHeight>innerWidth,girar=vertical!==fisicoVertical;const w=girar?innerHeight:innerWidth,h=girar?innerWidth:innerHeight;document.body.dataset.orientacao=o;document.body.style.setProperty('--projW',w+'px');document.body.style.setProperty('--projH',h+'px');document.body.style.setProperty('--projGiro',girar?'90deg':'0deg');}
 function giroPlateia(k){return 0;}
 const chave = () => app === 'ecofood' && modo !== 'sistema' ? modo : app;
 const retrato = k => DISP[k].tipo === 'cel';
@@ -367,7 +371,7 @@ function criar(k) {
   if (!PROJ) el.querySelector('iframe').addEventListener('load', e => { if(k===chave()&&projecao&&!projecao.closed) pedirEspelho(); });
   return el;
 }
-function escala(el) { const p = document.getElementById('palco').getBoundingClientRect(); const m = PROJ ? 10 : 30;
+function escala(el) { const palco=document.getElementById('palco'),p={width:palco.clientWidth,height:palco.clientHeight}; const m = PROJ ? 10 : 30;
   const girado=!!giroPlateia(chave()),w=girado?el.offsetHeight:el.offsetWidth,h=girado?el.offsetWidth:el.offsetHeight;return Math.max(.05,Math.min((p.width-m)/w,(p.height-m)/(h+(PROJ?0:50)),PROJ?3:1.4)); }
 function pos(s, giro) { return `translate(-50%,-50%) translateY(${(PROJ ? 0 : 20) * s}px) rotate(${giro}deg) scale(${s})`; }
 function ajustar(animar) {
@@ -488,7 +492,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126l', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126m', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
