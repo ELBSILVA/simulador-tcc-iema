@@ -793,6 +793,7 @@ TELAS.cozinha = u => {
    <div class="kpis"><div class="card k"><div class="sub">${esc(r)} • pegaram</div><b>${peg} <small class="sub">de ${DB.alunos.length}</small></b></div>
     <div class="card k"><div class="sub">Fila agora</div><b>${semLeit === null ? '—' : semLeit >= 3 ? '0' : 'andando'}</b><div class="sub">${semLeit === null ? 'sem leituras' : 'última leitura há ' + semLeit + ' min'}</div></div>
     <div class="card k"><div class="sub">Repetiram</div><b>${rep}</b></div><div class="card k"><div class="sub">Avaliações</div><b>${av.length}</b><div class="sub">${av.length ? pct(av.filter(a => a.nota >= 3).length, av.length) + '% bom/ótimo' : 'ainda nenhuma'}</div></div></div>
+   ${destaquesAvaliacoes()}
    <div class="card" style="text-align:center;padding:22px">${lib ? `<div style="font-size:18px;font-weight:800;color:#8a5a00;margin-bottom:10px">🔄 Repetição LIBERADA desde ${DB.repeticao[repKey(dt,r)].hora}</div><button class="btn red" style="max-width:420px;margin:auto" onclick="liberar('${r}',false)">Encerrar repetição</button>` :
      `<button class="btn" style="max-width:460px;margin:auto;font-size:19px;padding:16px" onclick="liberar('${r}',true)">${ic('repeat',22)} LIBERAR REPETIÇÃO</button><div class="sub" style="margin-top:8px">Aperte quando as filas acabarem: o totem avisa e as carteirinhas podem passar de novo.</div>`}</div>
    <div class="pdv"><div class="card"><div class="ttl">${ic('scale',18)} Pesagem das sobras — ${esc(r)}</div>
@@ -804,8 +805,7 @@ TELAS.cozinha = u => {
      <div class="sub" style="margin-top:6px">Os alunos dizem no tablet se o cardápio foi seguido: ${av.length ? pct(av.filter(a => a.seguido).length, av.length) + '% disseram sim' : 'sem respostas ainda'}.</div></div></div>`;
 };
 function liberar(r, sim) { DB.repeticao[repKey(iso(hoje()), r)] = {liberada:sim, hora:hhmm()}; save(); toast(sim ? '🔄 Repetição liberada! O totem já está avisando.' : 'Repetição encerrada.'); render(); }
-function salvarPeso(r, conf) { const v = parseFloat(String($('#kg').value).replace(',','.')); if (isNaN(v) || v < 0) return toast('Digite o peso em kg.');
-  if (v > 60 && !conf) return confirmar('Esse peso está em gramas?', `${fmt(v)} kg de sobras é muito. Se a balança mostrou <b>${kg2(v)} g</b>, o certo é <b>${kg2(v/1000)} kg</b>.`, () => { $('#kg').value = String(v/1000).replace('.',','); salvarPeso(r, true); }, 'Converter para ' + kg2(v/1000) + ' kg');
+function salvarPeso(r) { const raw = $('#kg').value.trim(); const v = /^\d+(?:[.,]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN; if (!Number.isFinite(v) || v < 0) return toast('Digite o peso em kg. Ex.: 50 ou 0,5.');
   const dt = iso(hoje());
   const p = DB.pesagens.find(x => x.data === dt && x.refeicao === r); if (p) p.kg = v; else DB.pesagens.push({id:uid(), data:dt, refeicao:r, kg:v}); save(); toast('✔ Pesagem salva: ' + kg2(v) + ' kg'); render(); }
 TELAS.pesagem = u => { const dias = [...new Set(DB.pesagens.map(p => p.data))].sort().reverse().slice(0, 15); const mx = Math.max(...DB.pesagens.map(p => p.kg), 1);
@@ -836,12 +836,12 @@ function textoFila(dt) { const f = ordemFila(dt);
 const medalha = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
 let despRef = null;
 function cardDespTurma(r) { const dt = iso(hoje()); const v = t => { const x = DB.desperdicio.find(y => y.data === dt && y.refeicao === r && y.turma === t); return x ? String(x.kg).replace('.', ',') : ''; };
-  return `<div class="card"><div class="ttl">${ic('scale',18)} Desperdício nos pratos por turma — ${esc(r)}</div><div class="sub" style="margin:4px 0 8px">A merendeira pesa o resto dos pratos de cada turma e digita em <b>kg</b> (0 se não sobrou nada). A pesagem de hoje define a ordem da fila de amanhã.</div>
+  return `<div class="card"><div class="ttl">${ic('scale',18)} Desperdício nos pratos por turma — ${esc(r)}</div><div class="sub" style="margin:4px 0 8px">Digite em <b>kg</b>: 50 = 50 kg; 0,5 = 500 g; 0,05 = 50 g (0 se não sobrou nada). A pesagem de hoje define a ordem da fila de amanhã.</div>
    <div class="dtgrid">${turmasFila().map(t => `<label class="dtc"><b>${t}</b><input class="dtin" data-t="${t}" type="text" inputmode="decimal" placeholder="kg" value="${v(t)}"></label>`).join('')}</div>
    <button class="btn sm" style="margin-top:10px" onclick="salvarDespTurma('${r}')">Salvar pesagem das turmas</button>${me() && me().perfil === 'gestao' ? ` <button class="btn sm out" style="margin-top:10px" onclick="ir('fila')">Ver ordem da fila</button>` : ''}</div>`; }
 function salvarDespTurma(r) { const dt = iso(hoje()); let n = 0, erro = '';
-  document.querySelectorAll('.dtin').forEach(i => { const t = i.dataset.t, raw = i.value.trim(); if (!raw) return; let v = parseFloat(raw.replace(',', '.')); if (isNaN(v) || v < 0) { erro = t; return; }
-    if (v > 30) v = v / 1000; // digitou em gramas
+  document.querySelectorAll('.dtin').forEach(i => { const t = i.dataset.t, raw = i.value.trim(); if (!raw) return; let v = /^\d+(?:[.,]\d+)?$/.test(raw) ? Number(raw.replace(',', '.')) : NaN; if (!Number.isFinite(v) || v < 0) { erro = t; return; }
+    // Peso sempre em kg: 50 = 50 kg; 0,5 = 500 g.
     const x = DB.desperdicio.find(y => y.data === dt && y.refeicao === r && y.turma === t); if (x) x.kg = v; else DB.desperdicio.push({id:uid(), data:dt, refeicao:r, turma:t, kg:v}); n++; });
   if (erro) return toast('Confira o peso da turma ' + erro + '.'); save(); toast(n ? `✔ Pesagem de ${n} turma(s) salva.` : 'Digite o peso de pelo menos uma turma.'); render(); }
 function filaHTML(dt, grande) { const f = ordemFila(dt); const mx = Math.max(...Object.values(f.kg), 0.1);
@@ -967,6 +967,19 @@ let perRel = 28;
 function estatPratos(dias) { const av = DB.avaliacoes.filter(a => (parse(iso(hoje())) - parse(a.data)) / 86400000 < dias); const m = {};
   av.forEach(a => { const k = a.prato; (m[k] = m[k] || {prato:k, ref:a.refeicao, n:0, bom:0}).n++; if (a.nota >= 3) m[k].bom++; });
   return Object.values(m).filter(x => x.n >= 3).map(x => ({...x, p:pct(x.bom, x.n)})).sort((a,b) => b.p - a.p); }
+function destaquesAvaliacoes() {
+  const h = hoje(), fim = iso(h), seg = new Date(h); seg.setDate(seg.getDate() - ((seg.getDay()+6)%7));
+  const periodos = [['Dia',fim],['Semana',iso(seg)],['Mês',iso(new Date(h.getFullYear(),h.getMonth(),1))],['Ano',iso(new Date(h.getFullYear(),0,1))]];
+  function melhor(ini, almoco) {
+    const m = new Map();
+    DB.avaliacoes.filter(a => a.data >= ini && a.data <= fim && (almoco ? a.refeicao === 'Almoço' : REF.includes(a.refeicao) && a.refeicao !== 'Almoço') && a.prato && Number(a.nota)>=1 && Number(a.nota)<=4).forEach(a => {
+      const k = a.prato.trim().toLocaleLowerCase('pt-BR'); const x = m.get(k) || {prato:a.prato,n:0,bom:0,soma:0}; x.n++; x.soma += Number(a.nota); if(Number(a.nota)>=3)x.bom++; m.set(k,x);
+    });
+    const l = [...m.values()].sort((a,b)=>b.bom/b.n-a.bom/a.n || b.soma/b.n-a.soma/a.n || b.n-a.n || a.prato.localeCompare(b.prato,'pt-BR'));
+    const x=l[0]; return x ? '<b>'+esc(x.prato)+'</b><div class="sub">'+pct(x.bom,x.n)+'% bom/ótimo • '+x.n+' avaliação(ões)</div>' : '<span class="sub">Sem avaliações</span>';
+  }
+  return '<div class="card"><div class="ttl">🏆 Lanche e almoço mais bem avaliados</div><div class="sub">Períodos do calendário atual • maior percentual bom/ótimo; desempate pela média da nota e quantidade de avaliações.</div><div class="li"><b style="width:20%">Período</b><b style="flex:1">Lanche (1º ou 2º)</b><b style="flex:1">Almoço</b></div>'+periodos.map(([nome,ini])=>'<div class="li" style="align-items:flex-start"><b style="width:20%">'+nome+'</b><div style="flex:1;min-width:0">'+melhor(ini,false)+'</div><div style="flex:1;min-width:0">'+melhor(ini,true)+'</div></div>').join('')+'</div>';
+}
 TELAS.relatorios = u => {
   const dias = [...new Set(DB.registros.map(x => x.data))].filter(d => (parse(iso(hoje())) - parse(d)) / 86400000 < perRel).sort();
   const regs = DB.registros.filter(x => dias.includes(x.data) && !x.repeticao);
@@ -984,6 +997,7 @@ TELAS.relatorios = u => {
     <div class="card k"><div class="sub">2º lanche</div><b>${adesao('2º lanche')}%</b><div class="sub">pegaram</div></div><div class="card k" style="background:#fdecee"><div class="sub">Sem comer</div><b style="color:var(--r)">${mSem}</b><div class="sub">alunos/dia (${pct(mSem,tot)}%)</div></div>
     <div class="card k"><div class="sub">Sobras</div><b>${fmt(mKg)} kg</b><div class="sub">por dia</div></div><div class="card k"><div class="sub">Bom/ótimo</div><b>${av.length?pct(av.filter(a=>a.nota>=3).length,av.length):0}%</b><div class="sub">${av.length} avaliações</div></div>
     <div class="card k"><div class="sub">Cardápio seguido</div><b>${av.length?pct(av.filter(a=>a.seguido).length,av.length):0}%</b></div><div class="card k"><div class="sub">Repetições</div><b>${reps}</b></div></div>
+   ${destaquesAvaliacoes()}
    <div class="pdv"><div class="card"><div class="ttl" style="margin-bottom:8px">👍 Mais aceitos (% bom/ótimo)</div>${pr.slice(0,5).map(x => barraP(x,'var(--ok)')).join('')}
      <div class="ttl" style="margin:14px 0 8px;color:var(--r)">👎 Menos aceitos</div>${pr.slice(-4).reverse().map(x => barraP(x,'var(--r)')).join('')}</div>
     <div><div class="card"><div class="ttl">Sobras por dia (kg)</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><polyline fill="none" stroke="#2f7a49" stroke-width="3" points="${pts}"/>${ult.map((v,i) => `<circle cx="${20 + i * (W - 30) / Math.max(1, ult.length - 1)}" cy="${H - 12 - v / mk * (H - 30)}" r="4" fill="${v > mKg * 1.25 ? '#c8643b' : '#2f7a49'}"/>`).join('')}</svg>
@@ -1004,18 +1018,37 @@ function sobrasSemana() {
 function cardSugestoes() { const c = {}; (DB.sugestoes || []).filter(x => diasAte2(x.data) < 30).forEach(x => { const k = x.texto.trim(); const kk = k.toLowerCase(); (c[kk] = c[kk] || {t:k, n:0}).n++; });
   const l = Object.values(c).sort((a,b) => b.n - a.n).slice(0, 6);
   return `<div class="card"><div class="ttl">💡 Pratos sugeridos pelos alunos (tablet)</div>${l.map(x => `<div class="li"><div style="flex:1">${esc(x.t)}</div><span class="sel s-b">${x.n} pedido${x.n>1?'s':''}</span></div>`).join('') || '<div class="sub" style="margin-top:6px">Nenhuma sugestão ainda.</div>'}</div>`; }
-const kg2 = n => n.toLocaleString('pt-BR', {maximumFractionDigits:2});
+const kg2 = n => n.toLocaleString('pt-BR', {maximumFractionDigits:3});
 const diasAte2 = s => Math.round((hoje() - parse(s)) / 86400000);
 const barraP = (x, cor) => `<div class="row" style="margin-bottom:7px"><span style="width:46%;font-size:13px">${esc(x.prato)} <span class="sub">• ${x.ref}</span></span><div style="flex:1;height:12px;background:#e3e9ee;border-radius:6px"><div style="height:12px;border-radius:6px;background:${cor};width:${x.p}%"></div></div><b style="width:42px;text-align:right;font-size:13px">${x.p}%</b></div>`;
 function compartilhar(t) { window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank'); }
 
 // ====================== MURAL ======================
-function muralHTML(cheio) { const pr = estatPratos(30); const top = pr.slice(0,3), piores = pr.slice(-2).reverse(); const ord = [top[1], top[0], top[2]]; const alt = [250, 300, 230]; const med = ['🥈','🥇','🥉'];
-  return `<div style="text-align:center"><div style="font-size:${cheio?34:24}px;font-weight:800">🏆 Ranking dos pratos — ${MESF[hoje().getMonth()]}</div><div class="sub" style="font-size:${cheio?16:13}px">% de avaliações bom ou ótimo no tablet</div></div>
-   <div class="podio">${ord.map((x,i) => x ? `<div class="pd" style="height:${alt[i] * (cheio?1.3:1)}px;background:${i===1?'#fff4cc':i===0?'#eef2f0':'#f8ebe0'}">${fotoP(x.prato) ? `<img src="${fotoP(x.prato)}" style="width:${cheio?150:110}px;height:${cheio?100:74}px;object-fit:contain;border-radius:12px">` : ''}<div style="font-size:${cheio?40:30}px">${med[i]}</div><b style="font-size:${cheio?20:15}px">${esc(x.prato)}</b><div style="font-size:${cheio?40:28}px;font-weight:800;color:var(--b2)">${x.p}%</div></div>` : '').join('')}</div>
-   <div class="card" style="background:#fff8e1;border:1px solid #f3dd9b;max-width:900px;margin:14px auto 0"><b style="color:#8a5a00">Vamos melhorar:</b> ${piores.map(x => `${esc(x.prato)} (${x.p}%)`).join(' • ')} <span class="sub">— a cozinha já está testando novas receitas.</span></div>
-   <div style="text-align:center;margin-top:12px"><span class="sel s-b" style="font-size:${cheio?16:13}px;padding:7px 16px">💡 Sua opinião ajuda a melhorar a alimentação! Avalie no tablet.</span></div>`; }
-TELAS.mural = u => `<div class="row" style="margin-bottom:12px"><h2 style="margin:0">${ic('trophy')} Mural — ranking mensal</h2><button class="btn sm" style="margin-left:auto" onclick="abrirJanela('mural')">${ic('tv',16)} Abrir em tela cheia</button></div><div class="card">${muralHTML(false)}</div>`;
+const MURAL_PERIODOS = ['Dia','Semana','Mês'];
+let muralPeriodo = 'Mês';
+try { const p = localStorage.getItem('ecofood_mural_periodo'); if(MURAL_PERIODOS.includes(p)) muralPeriodo=p; } catch(e){}
+function escolherMural(p) { if(!MURAL_PERIODOS.includes(p)) return; muralPeriodo=p; try{localStorage.setItem('ecofood_mural_periodo',p);}catch(e){} render(); }
+function rankingMural(ini,fim,almoco) {
+  const m=new Map();
+  DB.avaliacoes.filter(a=>a.data>=ini && a.data<=fim && (almoco?a.refeicao==='Almoço':REF.includes(a.refeicao)&&a.refeicao!=='Almoço') && typeof a.prato==='string' && a.prato.trim() && Number(a.nota)>=1 && Number(a.nota)<=4).forEach(a=>{
+    const k=a.prato.trim().toLocaleLowerCase('pt-BR'), x=m.get(k)||{prato:a.prato.trim(),n:0,bom:0,soma:0};
+    x.n++; x.soma+=Number(a.nota); if(Number(a.nota)>=3)x.bom++; m.set(k,x);
+  });
+  return [...m.values()].sort((a,b)=>b.bom/b.n-a.bom/a.n || b.soma/b.n-a.soma/a.n || b.n-a.n || a.prato.localeCompare(b.prato,'pt-BR'));
+}
+function muralHTML(cheio) {
+  const h=hoje(), fim=iso(h), seg=new Date(h); seg.setDate(seg.getDate()-((seg.getDay()+6)%7));
+  const ini=muralPeriodo==='Dia'?fim:muralPeriodo==='Semana'?iso(seg):iso(new Date(h.getFullYear(),h.getMonth(),1));
+  const lan=rankingMural(ini,fim,false), alm=rankingMural(ini,fim,true);
+  const bloco=(titulo,l,pior)=>{
+    const lista=(pior?l.slice().sort((a,b)=>a.bom/a.n-b.bom/b.n || a.soma/a.n-b.soma/b.n || b.n-a.n || a.prato.localeCompare(b.prato,'pt-BR')):l).slice(0,3);
+    return '<div class="card" style="margin:0;min-width:0;border-top:4px solid '+(pior?'#c8643b':'#2f7a49')+'"><div class="ttl" style="font-size:'+(cheio?23:17)+'px;margin-bottom:8px">'+titulo+'</div>'+
+      (lista.length?lista.map((x,i)=>'<div class="li" style="gap:10px;align-items:center"><b style="font-size:'+(cheio?24:17)+'px">'+(pior?(i+1)+'º':['🥇','🥈','🥉'][i])+'</b>'+(fotoP(x.prato)?'<img src="'+fotoP(x.prato)+'" style="width:'+(cheio?86:60)+'px;height:'+(cheio?65:45)+'px;object-fit:contain;border-radius:8px">':'')+'<div style="flex:1;min-width:0;overflow-wrap:anywhere"><b style="font-size:'+(cheio?20:15)+'px">'+esc(x.prato)+'</b><div class="sub">'+x.n+' avaliação(ões) • média '+(x.soma/x.n).toLocaleString('pt-BR',{maximumFractionDigits:2})+'/4</div></div><b style="color:'+(pior?'#a44729':'#2f7a49')+';font-size:'+(cheio?30:22)+'px">'+pct(x.bom,x.n)+'%</b></div>').join(''):'<div class="empty">Sem avaliações neste período.</div>')+'</div>';
+  };
+  return '<div style="text-align:center;margin-bottom:16px"><div style="font-size:'+(cheio?34:24)+'px;font-weight:800">🏆 Ranking das refeições</div><div class="row" style="justify-content:center;flex-wrap:wrap;margin:12px 0">'+MURAL_PERIODOS.map(p=>'<button class="btn sm '+(p===muralPeriodo?'':'out')+'" style="min-width:95px" onclick="escolherMural(\''+p+'\')" aria-pressed="'+(p===muralPeriodo)+'">'+p+'</button>').join('')+'</div><div class="sub">'+br(ini)+(ini===fim?'':' a '+br(fim))+' • % de avaliações Bom ou Ótimo</div></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px">'+bloco('🏆 Melhores lanches',lan,false)+bloco('🏆 Melhores almoços',alm,false)+bloco('▼ Lanches menos avaliados positivamente',lan,true)+bloco('▼ Almoços menos avaliados positivamente',alm,true)+'</div><div class="sub" style="text-align:center;margin:12px 0">1º e 2º lanches juntos • até 3 pratos por categoria • desempate pela média da nota e quantidade de avaliações. Com poucos pratos, o mesmo prato pode aparecer nas duas listas.</div>';
+}
+TELAS.mural = u => `<div class="row" style="margin-bottom:12px"><h2 style="margin:0">${ic('trophy')} Mural — ranking das refeições</h2><button class="btn sm" style="margin-left:auto" onclick="abrirJanela('mural')">${ic('tv',16)} Abrir em tela cheia</button></div><div class="card">${muralHTML(false)}</div>`;
 function renderMuralCheio() { document.body.classList.add('modo'); $('#app').innerHTML = `<div class="tv"><div class="row" style="justify-content:space-between;margin-bottom:10px"><img src="logo_iema.png" style="height:56px"><div class="row">${ICON.replace('width="34" height="34"','width="50" height="50"')}<b style="font-size:30px"><span style="color:var(--b)">Eco</span><span style="color:var(--r)">Food</span></b></div><div class="row" style="gap:6px">${btnCheia()}</div></div>${muralHTML(true)}</div>`; }
 
 // ====================== TOTEM ======================
@@ -1086,7 +1119,7 @@ function tabEnviar() { if (!tab.nota) return toast('Escolha uma das 4 carinhas.'
 TELAS.janelas = u => `${voltarBtn(ic('tv') + ' Totem e tablet')}<div class="sub" style="margin-bottom:12px">Cada tela abre numa janela própria, ligada ao mesmo sistema. Use o botão ⛶ (ou F11) para tela cheia e ESC para sair.</div>
    <div class="grid3"><div class="qa big" onclick="abrirJanela('totem')">${ic('tv',34)}<b>Totem do cardápio</b><span class="sub">TV de 32" no refeitório: cardápio do dia, da semana e a faixa de repetição.</span></div>
    <div class="qa big" onclick="abrirJanela('tablet')">${ic('tablet',34)}<b>Tablet de avaliação</b><span class="sub">Fora do PDV: o aluno passa a carteirinha e avalia (ruim, razoável, bom, ótimo).</span></div>
-   <div class="qa big" onclick="abrirJanela('mural')">${ic('trophy',34)}<b>Mural do ranking</b><span class="sub">Pratos mais aprovados do mês e os que precisam melhorar.</span></div></div>
+   <div class="qa big" onclick="abrirJanela('mural')">${ic('trophy',34)}<b>Mural do ranking</b><span class="sub">Melhores e piores lanches e almoços do dia, semana ou mês.</span></div></div>
    <div class="note">Dica para a apresentação: deixe o totem aberto ao lado, vá ao painel da cozinha e clique em "Liberar repetição" — a faixa aparece na hora.</div>`;
 TELAS.ajustes = u => `${voltarBtn(ic('gear') + ' Ajustes')}<div class="card" style="max-width:640px"><div class="ttl">Meus dados</div><label class="lbl">Nome</label><input id="un" value="${esc(u.nome)}"><label class="lbl">Nova senha (opcional)</label><input id="us" type="password" placeholder="deixe em branco para manter">
    <button class="btn" onclick="const x=me();x.nome=$('#un').value.trim()||x.nome;if($('#us').value.trim())x.senha=$('#us').value.trim();save();toast('Dados salvos!');render()">Salvar</button></div>
@@ -1104,7 +1137,7 @@ load(); render();
 if (!location.hash) { const s = document.createElement('div'); s.id = 'splash';
   s.innerHTML = '<img src="logo_iema.png" alt="IEMA"><div class="ap">' + ICON.replace('width="34" height="34"','width="50" height="50"') + '<div><span style="color:var(--b)">Eco</span><span style="color:var(--r)">Food</span></div></div><div class="ld"><i></i></div><div style="font-size:11px;letter-spacing:2px;color:#9a8a70;font-weight:600">PROJETO DESPERDÍCIO ZERO</div>';
   document.body.appendChild(s); setTimeout(() => { s.style.opacity = 0; setTimeout(() => s.remove(), 450); }, 1500); }
-window.addEventListener('storage', e => { if (e.key === KEY) { load(); const m = location.hash; if (m === '#totem' || m === '#mural') render(); else if (m === '#tablet') { if (tab.etapa === 'cart') renderTablet(); } else if (!$('input:focus')) render(); } });
+window.addEventListener('storage', e => { if(e.key === 'ecofood_mural_periodo' && MURAL_PERIODOS.includes(e.newValue)){muralPeriodo=e.newValue; if(location.hash==='#mural' || (typeof tela !== 'undefined' && tela==='mural')) render();} if (e.key === KEY) { load(); const m = location.hash; if (m === '#totem' || m === '#mural') render(); else if (m === '#tablet') { if (tab.etapa === 'cart') renderTablet(); } else if (!$('input:focus')) render(); } });
 setInterval(() => { const r = $('#relogio'); if (r) r.textContent = hhmm(); if (location.hash === '#totem') { load(); renderTotem(); } }, 20000);
 window.addEventListener('hashchange', () => render());
 
