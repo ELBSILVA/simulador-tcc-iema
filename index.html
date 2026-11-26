@@ -186,13 +186,13 @@ body.proj #palco{left:0!important;right:0!important}body.proj #abertura{left:0!i
       <button data-app="organiza"><img src="Logo_IEMA_Organiza.png" alt=""><div><b>IEMA Organiza</b><small>Grupo 01 · Aplicativo</small></div></button>
       <button data-app="stocktech"><img src="Logo_StockTech.png" alt=""><div><b>StockTech</b><small>Grupo 02 · Sistema</small></div></button>
       <button data-app="ecofood"><img src="Logo_EcoFood.png" alt=""><div><b>EcoFood</b><small>Grupo 03 · Sistema</small></div></button>
-    </div></div></section>
+    </div><button id="bCapaProjeto" class="acao" onclick="mostrarCapaProjeto()" disabled>▧ Exibir capa do projeto selecionado</button><button id="bDemoProjeto" class="acao" onclick="mostrarDemoProjeto()" disabled>▶ Exibir protótipo</button></div></section>
     <section class="etapa" data-step="2"><button class="etapaHead" onclick="alternarEtapa(2)" aria-expanded="false"><span class="num">02</span><span class="etapaNome">Projeção<small id="resProj">Segunda tela fechada</small></span><span class="chev">›</span></button>
     <div class="etapaBody" hidden>
       <div id="projStatus" role="status"><i></i><span>Segunda tela desconectada</span></div>
       <button id="bProj" class="acao prim" onclick="projetar()">▣ Abrir segunda tela</button>
       <button id="bFull" class="acao" onclick="plateiaCheia();abrirEtapa(3)" disabled>⛶ Tela cheia — segunda tela</button>
-      <button id="bTrans" class="acao" onclick="transmitir();abrirEtapa(3)" disabled>Exibir protótipo</button>
+
       <button class="acao" onclick="abrirEtapa(3)">Continuar para perfil ›</button>
     </div></section>
     <section class="etapa" data-step="3"><button class="etapaHead" onclick="alternarEtapa(3)" aria-expanded="false"><span class="num">03</span><span class="etapaNome">Perfil de acesso<small id="resPerfil">Escolha um perfil</small></span><span class="chev">›</span></button><div class="etapaBody" hidden><div class="lista" id="perfis"></div></div></section>
@@ -414,10 +414,10 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126e', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126f', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
-  document.body.classList.add('apresentando'); if(!geral)comCapa=false; marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
+  document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
   atualizarControles();
   desenharApres();
   const vigia = setInterval(() => { if (!projecao || projecao.closed) { clearInterval(vigia); fimProjecao(); } }, 800);
@@ -432,7 +432,7 @@ function entrarTelaCheia() { if (!PROJ) return; if (!document.fullscreenElement 
 function cheia() { plateiaCheia(); }
 
 /* tela cheia na plateia: pedido pelo apresentador (delegação) ou no 1º clique na janela da plateia */
-function atualizarControles(){const ativo=!!(projecao&&!projecao.closed), b=document.getElementById('bProj'),full=document.getElementById('bFull'),trans=document.getElementById('bTrans'),status=document.getElementById('projStatus');if(!b||!full||!trans||!status)return;b.textContent=ativo?'■ Encerrar projeção':'▣ Abrir segunda tela';b.classList.toggle('ativo',ativo);b.classList.toggle('prim',!ativo);full.disabled=!ativo;trans.disabled=!ativo||geral;trans.textContent=comCapa?'▶ Exibir protótipo':'▧ Exibir capa do projeto';status.classList.toggle('live',ativo);status.querySelector('span').textContent=ativo?'Segunda tela aberta':'Segunda tela desconectada';atualizarResumoMenu();}
+function atualizarControles(){const ativo=!!(projecao&&!projecao.closed), b=document.getElementById('bProj'),full=document.getElementById('bFull'),status=document.getElementById('projStatus');if(!b||!full||!status)return;b.textContent=ativo?'■ Encerrar projeção':'▣ Abrir segunda tela';b.classList.toggle('ativo',ativo);b.classList.toggle('prim',!ativo);full.disabled=!ativo;const capaBtn=document.getElementById('bCapaProjeto'),demoBtn=document.getElementById('bDemoProjeto');capaBtn.disabled=geral;demoBtn.disabled=geral;capaBtn.textContent='▧ Capa — '+(NOME[EST.app]||'projeto selecionado');capaBtn.classList.toggle('prim',!geral&&comCapa);demoBtn.classList.toggle('prim',!geral&&!comCapa);status.classList.toggle('live',ativo);status.querySelector('span').textContent=ativo?'Segunda tela aberta':'Segunda tela desconectada';atualizarResumoMenu();}
 function plateiaCheia(){if(!projecao||projecao.closed)return;try{projecao.focus();projecao.postMessage({simCheia:true},{targetOrigin:'*',delegate:'fullscreen'});}catch(e){try{projecao.postMessage({simCheia:true},'*');}catch(_) {}}}
 /* abertura (antes de escolher o projeto) */
 var geral = true;
@@ -444,12 +444,13 @@ function aberturaVisual(on) { const a = document.getElementById('abertura'); cle
 function abertura(on) { geral = on;if(on&&!PROJ)abrirEtapa(1); if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
   if (projecao && !projecao.closed) { projecao.postMessage({ simGeral: on }, '*'); aberturaVisual(on); document.getElementById('bAbert').classList.toggle('on', on); desenharApres(); }
   else aberturaVisual(on); }
-function escolher(a) { if (PROJ) return; cmd({ cmd: 'app', app: a }); abertura(false); if(projecao&&!projecao.closed){comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();} atualizarResumoMenu();abrirEtapa(2); }
+function escolher(a) { if (PROJ) return; cmd({cmd:'app',app:a});abertura(false);comCapa=true;marcaCapa();enviarEstadoPlateia();pedirEspelho();atualizarResumoMenu();abrirEtapa(projecao&&!projecao.closed?3:2); }
+function mostrarCapaProjeto(){if(PROJ||geral)return;comCapa=true;marcaCapa();enviarEstadoPlateia();}
+function mostrarDemoProjeto(){if(PROJ||geral)return;comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();abrirEtapa(3);}
 
 /* capa x protótipo na plateia */
 function transmitir() { comCapa = !comCapa; marcaCapa(); if (projecao && !projecao.closed) {projecao.postMessage({ simCapa: comCapa }, '*');pedirEspelho();} }
-function marcaCapa() { document.body.classList.toggle('capa', comCapa); const b = document.getElementById('bTrans');
-  b.textContent = comCapa ? '▶ Exibir protótipo' : '▧ Exibir capa do projeto'; b.classList.toggle('voltar', !comCapa); desenharApres(); }
+function marcaCapa() { document.body.classList.toggle('capa', comCapa); desenharApres(); }
 let capaT = null;
 function capaNaPlateia(on) { const c = document.getElementById('capa'); clearTimeout(capaT);
   if (on) { c.classList.add('vis'); c.offsetWidth; c.classList.remove('saindo'); document.body.classList.add('comCapa'); }
