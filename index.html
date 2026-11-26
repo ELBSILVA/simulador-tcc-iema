@@ -258,6 +258,24 @@ body.principalCheia #palco{left:0!important;right:0!important;bottom:0!important
 body.principalCheia #bCheiaPrincipal{display:none}body.principalCheia #bVoltarMenu{display:inline-block}
 @media(max-width:1100px){#topoProt{left:260px;right:255px}}
 @media(max-width:820px){#topoProt{left:230px;right:210px}}
+/* Apoio privado ao apresentador, sem interferir no espelho. */
+#guiaRapido,#guiaDetalhe{display:none}
+body.principalCheia #guiaRapido,body.principalCheia #guiaDetalhe{display:block;position:fixed;z-index:48;background:#1b2330;color:#eaf0f8;padding:14px;box-sizing:border-box;overflow:auto;border:1px solid #43536a;border-radius:10px}
+#guiaRapido h3,#guiaDetalhe h3{font-size:15px;margin:0 0 10px;color:#a7c8ff}
+#guiaRapido h4,#guiaDetalhe h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#9eafc5;margin:10px 0 6px}
+#guiaPerfis,#guiaTelas{display:flex;flex-wrap:wrap;gap:5px}
+#guiaRapido h4{flex-basis:100%}
+#guiaRapido button{font:600 12px Segoe UI,Arial;cursor:pointer;background:#253142;color:#eaf0f8;border:1px solid #43536a;border-radius:7px;padding:8px 10px;user-select:none;text-align:left}
+#guiaRapido button.on{background:#3179df;border-color:#3179df;color:white}
+#guiaTitulo{font-size:17px;font-weight:700;color:white}
+#guiaDetalhe p{font-size:14px;line-height:1.45;color:#d5deeb;margin:8px 0}
+body.principalCheia[data-guia="cel"] #guiaRapido{left:10px;top:54px;bottom:10px;width:clamp(205px,25vw,340px)}
+body.principalCheia[data-guia="cel"] #guiaDetalhe{right:10px;top:54px;bottom:10px;width:clamp(205px,25vw,340px)}
+body.principalCheia[data-guia="cel"] #palco{left:calc(clamp(205px,25vw,340px) + 20px)!important;right:calc(clamp(205px,25vw,340px) + 20px)!important}
+body.principalCheia[data-guia="pc"] #palco{bottom:clamp(190px,30vh,285px)!important}
+body.principalCheia[data-guia="pc"] #guiaRapido{left:10px;bottom:10px;width:60%;height:calc(clamp(190px,30vh,285px) - 20px)}
+body.principalCheia[data-guia="pc"] #guiaDetalhe{right:10px;bottom:10px;width:calc(40% - 30px);height:calc(clamp(190px,30vh,285px) - 20px)}
+@media(max-width:800px){body.principalCheia[data-guia="cel"] #palco{left:0!important;right:0!important;bottom:230px!important}body.principalCheia[data-guia="cel"] #guiaRapido{left:6px;top:auto;bottom:6px;width:54%;height:218px}body.principalCheia[data-guia="cel"] #guiaDetalhe{right:6px;top:auto;bottom:6px;width:calc(46% - 18px);height:218px}}
 </style>
 </head>
 <body>
@@ -285,7 +303,7 @@ body.principalCheia #bCheiaPrincipal{display:none}body.principalCheia #bVoltarMe
   </div>
   <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
-<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
+<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>O que mostrar</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>O que esta função faz</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>Na demonstração</h4><p id="guiaAcao"></p></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
 <div id="barraDemonstracao" role="toolbar" aria-label="Controles da demonstração">
  <div class="barraGrupo"><span>Exibição na 2ª tela</span><div class="barraBotoes"><button id="bCapaProjeto" onclick="mostrarCapaProjeto()" disabled>▧ Capa</button><button id="bDemoProjeto" onclick="mostrarDemoProjeto()" disabled>▶ Protótipo</button></div></div>
  <div class="barraGrupo"><span>Orientação da 2ª tela</span><div class="barraBotoes" role="group" aria-label="Orientação da segunda tela"><button type="button" data-orientacao="retrato" aria-pressed="true" onclick="definirOrientacao('retrato')">▯ Retrato</button><button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button></div></div>
@@ -473,6 +491,7 @@ function desenharLado() {
       : `<button class="${(n[0].startsWith('win:') ? m === n[0].slice(4) : (!emDisp && i.tela === n[0])) ? 'on' : ''}" onclick="cmd({cmd:'tela',tela:'${n[0]}'})">${ICO[n[1]] || '•'} ${n[2]}</button>`).join('');
 }
 function desenharApres() {
+  atualizarGuia();
   const { app: a, modo: m, info: i } = EST, emDisp = a === 'ecofood' && m !== 'sistema';
   const tela = emDisp ? m : (i && i.perfil ? i.tela : '');
   const nomeTela = emDisp ? DISP[m].rot.split('– ')[1] : (i && i.perfil ? ((i.menu.find(n => n[0] === i.tela) || [])[2] || i.tela) : 'Tela de entrada');
@@ -510,7 +529,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126p', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126q', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -530,8 +549,43 @@ function entrarTelaCheia(manual=false){if(!PROJ)return;if(navegadorEmTelaCheia()
 function mostrarAjudaCheia(){if(!PROJ)return;atualizarAjudaCheia();}
 function atualizarAjudaCheia(){if(!PROJ)return;const ativo=navegadorEmTelaCheia(),h=document.getElementById('ajudaCheia');if(h)h.hidden=ativo;try{window.opener?.postMessage({simFullStatus:ativo},'*');}catch(e){}}
 function cheia() { plateiaCheia(); }
+const GUIA_EXTRA={
+'organiza:material':['Disponibiliza materiais de estudo por turma.','Mostre o cadastro de título, link e turma destinatária.'],
+'organiza:ajustes':['Reúne as configurações e dados do usuário.','Mostre as opções disponíveis no perfil atual.'],
+'stocktech:alimentos':['Consulta e cadastro de alimentos do estoque.','Abra um alimento e mostre os dados disponíveis.'],
+'stocktech:historico':['Consulta movimentações de entrada e saída.','Mostre os registros anteriores e os dados de cada movimento.'],
+'stocktech:usuarios':['Gerencia os usuários autorizados do sistema.','Mostre a lista de usuários e seus perfis.'],
+'ecofood:situacoes':['Apresenta situações possíveis na leitura da carteirinha.','Mostre os estados de registro e como o PDV responde.'],
+'ecofood:provisoria':['Permite emitir uma carteirinha provisória.','Mostre o procedimento para um aluno sem a carteirinha.'],
+'ecofood:carteirinhas':['Organiza a impressão das carteirinhas.','Mostre a seleção de alunos para impressão.'],
+'ecofood:fotos':['Gerencia as imagens dos pratos.','Mostre as fotos disponíveis e a opção de substituição.'],
+'ecofood:fila':['Organiza a ordem de atendimento das turmas.','Mostre como consultar a ordem da fila.'],
+'ecofood:desperdicio':['Acompanha o desperdício por turma, complementando o Projeto Desperdício Zero já existente na escola.','Mostre os registros e a comparação entre turmas.'],
+'ecofood:alunos':['Consulta alunos e suas restrições alimentares.','Mostre como identificar uma restrição no cadastro.'],
+'ecofood:ajustes':['Reúne as configurações do sistema.','Mostre os parâmetros disponíveis para o perfil.']
+};
+const GUIA_ACAO={
+'organiza:inicio':'Mostre os avisos e os próximos prazos.','organiza:horario':'Escolha um dia e mostre as aulas.','organiza:trabalhos':'Abra uma atividade e marque como concluída.','organiza:desempenho':'Mostre as notas e a média.','organiza:minhas':'Mostre o cadastro de uma atividade ou prova.','organiza:avisos':'Mostre a criação e seleção das turmas.','organiza:eventos':'Abra um evento do calendário.','organiza:usuarios':'Mostre os perfis cadastrados.',
+'stocktech:painel':'Destaque os indicadores e alertas.','stocktech:entrada':'Mostre a leitura do código e os campos da entrega.','stocktech:saida':'Escolha um alimento e uma refeição.','stocktech:alertas':'Mostre validade e estoque baixo.','stocktech:compras':'Mostre os itens sugeridos.','stocktech:relatorio':'Abra o relatório semanal.','stocktech:ajustes':'Mostre o prazo de alerta.',
+'ecofood:pdv':'Simule a leitura de uma carteirinha.','ecofood:cozinha':'Mostre o total de refeições e a repetição.','ecofood:cardapio':'Abra um dia do cardápio.','ecofood:pesagem':'Mostre o formulário de registro de sobras.','ecofood:relatorios':'Mostre os indicadores disponíveis.','ecofood:mural':'Alterne o período do ranking.','ecofood:totem':'Mostre o cardápio do dia na TV.','ecofood:tablet':'Simule uma avaliação de refeição.'
+};
+let guiaAssinatura='';
+function atualizarGuia(){if(PROJ||!document.body.classList.contains('principalCheia'))return;const {app:a,modo:m,info:i}=EST;document.body.dataset.guia=retrato(chave())?'cel':'pc';const emDisp=a==='ecofood'&&m!=='sistema',t=emDisp?m:(i?.tela||''),nav=i?.menu||[],perfis=i?.perfis||[];const sig=JSON.stringify([a,m,i?.perfil,t,nav,perfis]);if(sig===guiaAssinatura)return;guiaAssinatura=sig;
+const P=document.getElementById('guiaPerfis'),T=document.getElementById('guiaTelas');P.replaceChildren();T.replaceChildren();
+function titulo(el,txt){const h=document.createElement('h4');h.textContent=txt;el.append(h);}
+function botao(el,txt,on,fn){const b=document.createElement('button');b.type='button';b.textContent=txt;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',String(!!on));b.onclick=fn;el.append(b);}
+titulo(P,'Trocar perfil diretamente');botao(P,'Tela de entrada',!i?.perfil&&!emDisp,()=>cmd({cmd:'sair'}));for(const p of perfis)botao(P,PERFIL[p.perfil]||p.perfil,i?.perfil===p.perfil&&!emDisp,()=>cmd({cmd:'perfil',perfil:p.perfil}));
+titulo(T,'Navegação rápida');if(emDisp)botao(T,'Voltar ao sistema',false,()=>cmd({cmd:'modo',modo:'sistema'}));if(!i?.perfil&&!emDisp)titulo(T,'Escolha um perfil para acessar suas funções');
+for(const n of nav){if(n[0]==='#'){titulo(T,n[1]);continue;}const on=n[0].startsWith('win:')?emDisp&&m===n[0].slice(4):!emDisp&&t===n[0];botao(T,(ICO[n[1]]||'•')+' '+n[2],on,()=>cmd({cmd:'tela',tela:n[0]}));}
+if(a==='ecofood'){titulo(T,'Telas externas');for(const [k,label] of [['totem','Totem'],['tablet','Tablet'],['mural','Mural']])if(!nav.some(n=>n[0]==='win:'+k))botao(T,label,m===k,()=>cmd({cmd:'modo',modo:k}));}
+const key=a+':'+t,extra=GUIA_EXTRA[key],name=emDisp?DISP[m].rot.split('– ')[1]:(nav.find(n=>n[0]===t)?.[2]||t||'Tela de entrada');
+document.getElementById('guiaTitulo').textContent=NOME[a]+' — '+name;
+document.getElementById('guiaTexto').textContent=extra?.[0]||FALA[key]||FALA[a+':']||'Explore a função selecionada.';
+document.getElementById('guiaAcao').textContent=extra?.[1]||GUIA_ACAO[key]||(!t?'Escolha um perfil de demonstração usando os botões, sem precisar digitar a senha.':'Mostre os campos e as ações disponíveis nesta tela.');
+requestAnimationFrame(()=>ajustar(false));}
+
 let principalFullNativo=false;
-function cheiaPrincipal(){if(PROJ||geral)return;document.body.classList.add('principalCheia');requestAnimationFrame(()=>ajustar(false));if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen({navigationUI:'hide'}).then(()=>{principalFullNativo=true;}).catch(()=>{});}}
+function cheiaPrincipal(){if(PROJ||geral)return;document.body.classList.add('principalCheia');guiaAssinatura='';atualizarGuia();requestAnimationFrame(()=>ajustar(false));if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen({navigationUI:'hide'}).then(()=>{principalFullNativo=true;}).catch(()=>{});}}
 function voltarMenuPrincipal(){if(PROJ)return;document.body.classList.remove('principalCheia');principalFullNativo=false;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});requestAnimationFrame(()=>ajustar(false));}
 document.addEventListener('fullscreenchange',()=>{if(!PROJ&&document.body.classList.contains('principalCheia')&&document.fullscreenElement)principalFullNativo=true;else if(!PROJ&&principalFullNativo&&!document.fullscreenElement)voltarMenuPrincipal();});
 document.addEventListener('keydown',e=>{if(!PROJ&&e.key==='Escape'&&document.body.classList.contains('principalCheia'))voltarMenuPrincipal();});
