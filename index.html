@@ -240,6 +240,7 @@ body.proj[data-orientacao="retrato"] #capa .gp b{font-size:3cqh}
 body.proj #cronoP{position:fixed;left:50%;top:50%;bottom:auto;right:auto;width:var(--projW,100vw);height:var(--projH,100vh);transform:translate(-50%,-50%) rotate(var(--projGiro,0deg));transform-origin:center;align-items:flex-end;justify-content:flex-start;padding:18px;pointer-events:none}
 body.proj #cronoP .rel{flex:none}
 body.proj #capa.saindo{opacity:0}
+#ajudaCheia{display:none}body.proj #ajudaCheia:not([hidden]){display:block;position:fixed;right:12px;top:12px;z-index:10000;padding:9px 14px;border:1px solid #7188ac;border-radius:8px;background:#253142;color:#fff;font:600 12px Segoe UI,Arial;cursor:pointer}body.proj:fullscreen #ajudaCheia{display:none!important}
 </style>
 </head>
 <body>
@@ -267,7 +268,7 @@ body.proj #capa.saindo{opacity:0}
   </div>
   <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
-<main id="palco"></main>
+<main id="palco"></main><button id="ajudaCheia" hidden onclick="entrarTelaCheia()" title="O navegador exige um clique para entrar em tela cheia">⛶ Ativar tela cheia</button>
 <div id="barraDemonstracao" role="toolbar" aria-label="Controles da demonstração">
  <div class="barraGrupo"><span>Exibição na 2ª tela</span><div class="barraBotoes"><button id="bCapaProjeto" onclick="mostrarCapaProjeto()" disabled>▧ Capa</button><button id="bDemoProjeto" onclick="mostrarDemoProjeto()" disabled>▶ Protótipo</button></div></div>
  <div class="barraGrupo"><span>Orientação da 2ª tela</span><div class="barraBotoes" role="group" aria-label="Orientação da segunda tela"><button type="button" data-orientacao="retrato" aria-pressed="true" onclick="definirOrientacao('retrato')">▯ Retrato</button><button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button></div></div>
@@ -425,7 +426,7 @@ window.addEventListener('message',e=>{
   if('simCapa' in d){capaNaPlateia(d.simCapa);return;}
   return;
  }
- if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();return;} if(d.simNeedMirror&&projecao&&e.source===projecao){pedirEspelho();return;}
+ if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();plateiaCheia();return;} if(d.simNeedMirror&&projecao&&e.source===projecao){pedirEspelho();return;}
  if(d.ecofood==='abrir'&&e.source===frameDe(chave())&&DISP[d.modo]){executar({cmd:'modo',modo:d.modo});return;}
  if(d.simTela&&Object.values(criados).some(el=>el?.querySelector('iframe')?.contentWindow===e.source)){const k=Object.keys(criados).find(k=>criados[k]?.querySelector('iframe')?.contentWindow===e.source);if(projecao&&!projecao.closed&&k===chave())projecao.postMessage({simMirror:{k,t:d.simTela}},'*');return;}
  if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){INFO[k]=d.simInfo;if(k===app)avisaControle();} }
@@ -487,17 +488,18 @@ setInterval(()=>{if(!PROJ&&projecao&&!projecao.closed)pedirEspelho();},1800);
 let projecao = null;
 async function projetar() {
   if (projecao && !projecao.closed) { projecao.close(); return; }
-  let feat = 'popup,width=1280,height=760';
+  let feat = `popup,fullscreen=yes,left=${screen.availLeft||0},top=${screen.availTop||0},width=${screen.availWidth||1280},height=${screen.availHeight||760}`;
   try {                                       // se o navegador permitir, já abre na outra tela
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
-      if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
+      if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126m', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126n', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
   atualizarControles();
   desenharApres();
+  plateiaCheia();
   const vigia = setInterval(() => { if (!projecao || projecao.closed) { clearInterval(vigia); fimProjecao(); } }, 800);
 }
 function fimProjecao() {
@@ -506,7 +508,9 @@ function fimProjecao() {
   mostrarPalco(); avisaControle();
   if (geral) aberturaVisual(true); else document.body.classList.remove('geral');
 }
-function entrarTelaCheia() { if (!PROJ) return; if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); }
+function entrarTelaCheia(){if(!PROJ||document.fullscreenElement)return;if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>mostrarAjudaCheia());}else mostrarAjudaCheia();}
+function mostrarAjudaCheia(){if(!PROJ||document.fullscreenElement)return;const h=document.getElementById('ajudaCheia');if(h)h.hidden=false;}
+function atualizarAjudaCheia(){const h=document.getElementById('ajudaCheia');if(h)h.hidden=!!document.fullscreenElement;}
 function cheia() { plateiaCheia(); }
 
 /* tela cheia na plateia: pedido pelo apresentador (delegação) ou no 1º clique na janela da plateia */
@@ -581,7 +585,7 @@ if (!PROJ && navigator.onLine && !BUILD.startsWith('__')) {
 }
 
 /* início */
-if (PROJ) { dimensionarProjecao();capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.getElementById('palco').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#17191e;font:600 22px Segoe UI,Arial;text-align:center;padding:30px">Conectando à tela principal…<br><small style="display:block;margin-top:12px;color:#aab0ba;font-size:14px">A demonstração aparecerá aqui automaticamente.</small></div>'; document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); setInterval(()=>{try{window.opener&&window.opener.postMessage({simNeedMirror:true},'*');}catch(e){}},1200); } catch (e) {} }
+if (PROJ) { document.addEventListener('fullscreenchange',atualizarAjudaCheia);entrarTelaCheia();dimensionarProjecao();capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.getElementById('palco').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#17191e;font:600 22px Segoe UI,Arial;text-align:center;padding:30px">Conectando à tela principal…<br><small style="display:block;margin-top:12px;color:#aab0ba;font-size:14px">A demonstração aparecerá aqui automaticamente.</small></div>'; document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); setInterval(()=>{try{window.opener&&window.opener.postMessage({simNeedMirror:true},'*');}catch(e){}},1200); } catch (e) {} }
 else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); atualizarControles(); atualizarOrientacao(); abrirEtapa(0); }
 </script>
 </body>
