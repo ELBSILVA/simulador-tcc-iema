@@ -298,6 +298,16 @@ body.principalCheia[data-guia="pc"] #palco{bottom:0!important}
 body.principalCheia[data-guia="pc"].guiaAberto #palco,body.principalCheia[data-guia="pc"].colaAberta #palco{bottom:clamp(190px,30vh,285px)!important}
 body.principalCheia[data-guia="pc"].colaAberta:not(.guiaAberto) #guiaDetalhe,body.principalCheia[data-guia="pc"].guiaAberto:not(.colaAberta) #guiaRapido{left:10px;right:10px;width:auto}
 @media(max-width:800px){body.principalCheia[data-guia="cel"].guiaAberto #palco,body.principalCheia[data-guia="cel"].colaAberta #palco{left:0!important;right:0!important;bottom:230px!important}body.principalCheia[data-guia="cel"].colaAberta:not(.guiaAberto) #guiaDetalhe,body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #guiaRapido{left:6px;right:6px;width:auto}#topoProt button{font-size:11px;padding:6px 8px}}
+/* Cola horizontal de ponta a ponta no pé do monitor. */
+body.principalCheia[data-guia="pc"].colaAberta #guiaDetalhe{left:10px;right:10px;width:auto;bottom:8px;height:clamp(104px,16vh,155px);display:grid!important;grid-template-columns:minmax(140px,22%) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:16px;row-gap:3px;padding:10px 14px;align-content:start}
+body.principalCheia[data-guia="pc"] #guiaDetalhe h3{grid-column:1;grid-row:1;margin:0;font-size:12px}
+body.principalCheia[data-guia="pc"] #guiaTitulo{grid-column:1;grid-row:2;font-size:15px}
+body.principalCheia[data-guia="pc"] #guiaTexto{grid-column:2;grid-row:1;margin:0;font-size:14px}
+body.principalCheia[data-guia="pc"] #guiaDetalhe h4{display:none}
+body.principalCheia[data-guia="pc"] #guiaAcao{grid-column:2;grid-row:2;margin:0;font-size:13px;color:#a7c8ff}
+body.principalCheia[data-guia="pc"].colaAberta:not(.guiaAberto) #palco{bottom:calc(clamp(104px,16vh,155px) + 16px)!important}
+body.principalCheia[data-guia="pc"].guiaAberto.colaAberta #guiaRapido{left:10px;right:10px;width:auto;bottom:calc(clamp(104px,16vh,155px) + 16px);height:clamp(105px,17vh,170px)}
+body.principalCheia[data-guia="pc"].guiaAberto.colaAberta #palco{bottom:calc(clamp(104px,16vh,155px) + clamp(105px,17vh,170px) + 24px)!important}
 </style>
 </head>
 <body>
@@ -551,7 +561,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126s', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126t', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
