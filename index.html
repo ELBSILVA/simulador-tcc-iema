@@ -174,6 +174,11 @@ body.proj #palco{left:0!important;right:0!important}body.proj #abertura{left:0!i
 #lado .chev{font-size:23px;line-height:1;color:#a4b1c2;transition:transform .15s}#lado .etapaHead[aria-expanded="true"] .chev{transform:rotate(90deg)}
 #lado .etapaBody{padding:9px 10px 11px}#lado .etapaBody[hidden]{display:none!important}
 #lado #bAbert{margin-bottom:14px;font-size:12px}#lado .atalhosProj{display:flex;gap:6px;margin-bottom:3px}#lado .atalhosProj button{flex:1;padding:8px 5px;border:1px solid #43536a;background:#253142;color:#edf2f8;border-radius:8px;font-size:11px;cursor:pointer}#lado .atalhosProj button:disabled{opacity:.4;cursor:default}
+#lado .orientacaoLabel{font-size:11px;font-weight:650;color:#c7d3e3;margin:12px 0 6px}
+#lado .orientacaoGrupo{display:flex;gap:3px;border:1px solid #43536a;background:#171d27;padding:3px;border-radius:9px}
+#lado .orientacaoGrupo button{flex:1;min-width:0;padding:9px 3px;border:0;border-radius:6px;background:transparent;color:#bdc9d9;font-size:11px;font-weight:600;cursor:pointer}
+#lado .orientacaoGrupo button.on{background:#3179df;color:#fff}#lado .orientacaoGrupo button:hover:not(.on){background:#293748}
+#lado .orientacaoAjuda{font-size:10px;line-height:1.4;color:#a4b1c2;margin:6px 0 12px}
 </style>
 </head>
 <body>
@@ -192,6 +197,12 @@ body.proj #palco{left:0!important;right:0!important}body.proj #abertura{left:0!i
       <div id="projStatus" role="status"><i></i><span>Segunda tela desconectada</span></div>
       <button id="bProj" class="acao prim" onclick="projetar()">▣ Abrir segunda tela</button>
       <button id="bFull" class="acao" onclick="plateiaCheia();abrirEtapa(3)" disabled>⛶ Tela cheia — segunda tela</button>
+      <div class="orientacaoLabel">Orientação da demonstração</div>
+      <div class="orientacaoGrupo" role="group" aria-label="Orientação da segunda tela">
+        <button type="button" data-orientacao="auto" aria-pressed="true" onclick="definirOrientacao('auto')">Auto</button>
+        <button type="button" data-orientacao="retrato" aria-pressed="false" onclick="definirOrientacao('retrato')">▯ Retrato</button>
+        <button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button>
+      </div><div class="orientacaoAjuda">Ajusta somente o aparelho na projeção, sem alterar o aplicativo original.</div>
 
       <button class="acao" onclick="abrirEtapa(3)">Continuar para perfil ›</button>
     </div></section>
@@ -275,6 +286,11 @@ const FALA = {
 const criados = {}, INFO = {};
 var comCapa = true;
 let app = 'organiza', modo = 'sistema', ultimo = null;
+let orientacaoPlateia='auto';try{const o=localStorage.getItem('simulador_orientacao');if(['auto','retrato','paisagem'].includes(o))orientacaoPlateia=o;}catch(e){}
+function definirOrientacao(o){if(PROJ||!['auto','retrato','paisagem'].includes(o))return;orientacaoPlateia=o;try{localStorage.setItem('simulador_orientacao',o);}catch(e){}atualizarOrientacao();if(projecao&&!projecao.closed)projecao.postMessage({simOrientacao:o},'*');}
+function atualizarOrientacao(){document.querySelectorAll('[data-orientacao]').forEach(b=>{const on=b.dataset.orientacao===orientacaoPlateia;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));});}
+function aplicarOrientacao(o){if(!PROJ||!['auto','retrato','paisagem'].includes(o))return;orientacaoPlateia=o;document.body.dataset.orientacao=o;ajustar(false);}
+function giroPlateia(k){if(!PROJ||orientacaoPlateia==='auto')return 0;return ((orientacaoPlateia==='retrato')!==retrato(k))?90:0;}
 const chave = () => app === 'ecofood' && modo !== 'sistema' ? modo : app;
 const retrato = k => DISP[k].tipo === 'cel';
 function relogio() { const t = new Date().toTimeString().slice(0,5); document.querySelectorAll('.sb .hr').forEach(e => e.textContent = t); }
@@ -294,7 +310,7 @@ function criar(k) {
   return el;
 }
 function escala(el) { const p = document.getElementById('palco').getBoundingClientRect(); const m = PROJ ? 10 : 30;
-  return Math.min((p.width - m) / el.offsetWidth, (p.height - m) / (el.offsetHeight + (PROJ ? 0 : 50)), PROJ ? 3 : 1.4); }
+  const girado=!!giroPlateia(chave()),w=girado?el.offsetHeight:el.offsetWidth,h=girado?el.offsetWidth:el.offsetHeight;return Math.max(.05,Math.min((p.width-m)/w,(p.height-m)/(h+(PROJ?0:50)),PROJ?3:1.4)); }
 function pos(s, giro) { return `translate(-50%,-50%) translateY(${(PROJ ? 0 : 20) * s}px) rotate(${giro}deg) scale(${s})`; }
 function ajustar(animar) {
   const k = chave(), el = criados[k]; if (!el || !el.offsetWidth) return;
@@ -303,8 +319,8 @@ function ajustar(animar) {
     el.style.opacity = '0'; el.style.transform = pos(s * .8, retrato(k) ? -90 : 90); el.offsetWidth;
     el.style.transition = ''; el.style.opacity = '1';
   } else { el.offsetWidth; el.style.transition = ''; el.style.opacity = '1'; }
-  el.style.transform = pos(s, 0); ultimo = k;
-  if (document.fullscreenElement && screen.orientation && screen.orientation.lock) screen.orientation.lock(retrato(k) ? 'portrait' : 'landscape').catch(() => {});
+  el.style.transform = pos(s, giroPlateia(k)); ultimo = k;
+  // Não altera a orientação física do monitor; apenas gira a demonstração.
 }
 function mostrarPalco() {
   const k = chave();
@@ -340,9 +356,9 @@ window.addEventListener('message',e=>{
  if(PROJ){
   if(e.source!==window.opener)return;
   if(d.simMirror){receberEspelho(d.simMirror);return;}
-  if(d.simApresentacao){const st=d.simApresentacao;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;geral=!!st.geral;comCapa=!!st.capa;capaPlateia();aberturaVisual(geral);capaNaPlateia(comCapa);if(!geral&&comCapa){clearTimeout(abT);document.body.classList.remove('geral');document.getElementById('abertura').classList.remove('saindo');}}return;} if(d.simMeta){const st=d.simMeta;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;capaPlateia();}return;}
+  if(d.simApresentacao){const st=d.simApresentacao;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;geral=!!st.geral;comCapa=!!st.capa;aplicarOrientacao(st.orientacao||'auto');capaPlateia();aberturaVisual(geral);capaNaPlateia(comCapa);if(!geral&&comCapa){clearTimeout(abT);document.body.classList.remove('geral');document.getElementById('abertura').classList.remove('saindo');}}return;} if(d.simMeta){const st=d.simMeta;if(DISP[st.k]&&NOME[st.app]){app=st.app;modo=st.modo;capaPlateia();}return;}
   if(d.simTempo){tempoPlateia(d.simTempo);return;}
-  if(d.simCheia){entrarTelaCheia();return;}
+  if(d.simOrientacao){aplicarOrientacao(d.simOrientacao);return;} if(d.simCheia){entrarTelaCheia();return;}
   if('simGeral' in d){aberturaVisual(d.simGeral);return;}
   if('simCapa' in d){capaNaPlateia(d.simCapa);return;}
   return;
@@ -395,7 +411,7 @@ document.querySelectorAll('.apps button').forEach(b => b.onclick = () => escolhe
 /* Espelho passivo: nenhum aplicativo ou script é executado na segunda janela. */
 let mirrorK=null,mirrorFrame=null,mirrorHead='',mirrorPending=null,mirrorLoading=false;
 function pedirEspelho(){if(PROJ||!projecao||projecao.closed)return;let enviados=0;for(const [k,el] of Object.entries(criados)){const w=el?.querySelector('iframe')?.contentWindow;if(w){w.postMessage({sim:'espelho',on:k===chave()},'*');if(k===chave())enviados++;}}if(!enviados)console.warn('Simulador: aplicativo principal ainda não está pronto para espelhamento.');}
-function enviarEstadoPlateia(){if(!projecao||projecao.closed)return;projecao.postMessage({simApresentacao:{...estado(),geral,capa:comCapa}},'*');}
+function enviarEstadoPlateia(){if(!projecao||projecao.closed)return;projecao.postMessage({simApresentacao:{...estado(),geral,capa:comCapa,orientacao:orientacaoPlateia}},'*');}
 function montarEspelho(k){const el=document.createElement('div');el.className='disp vis '+DISP[k].tipo;el.innerHTML=moldura(k,`<iframe sandbox="allow-same-origin" tabindex="-1" aria-hidden="true" width="${DISP[k].w}" height="${altApp(k)}" style="pointer-events:none"></iframe>`);document.getElementById('palco').replaceChildren(el);for(const j of Object.keys(criados))delete criados[j];criados[k]=el;mirrorK=k;mirrorFrame=el.querySelector('iframe');mirrorHead='';mirrorLoading=false;mirrorPending=null;relogio();requestAnimationFrame(()=>ajustar(false));}
 function aplicarRolagem(doc,t){doc.querySelectorAll('[data-sc],[data-sx]').forEach(el=>{el.scrollTop=Number(el.getAttribute('data-sc'))||0;el.scrollLeft=Number(el.getAttribute('data-sx'))||0;});const root=doc.scrollingElement||doc.documentElement;root.scrollTop=t.sy||0;root.scrollLeft=t.sx||0;}
 function receberEspelho(msg){if(!PROJ||!DISP[msg.k]||!msg.t?.html)return;const k=msg.k,t=msg.t;if(mirrorK!==k)montarEspelho(k);if(mirrorLoading){mirrorPending=msg;return;}const frame=mirrorFrame;const parsed=new DOMParser().parseFromString(t.html,'text/html');parsed.querySelectorAll('script,iframe,object,embed,meta[http-equiv="refresh"]').forEach(n=>n.remove());parsed.querySelectorAll('*').forEach(n=>{for(const at of [...n.attributes])if(/^on/i.test(at.name))n.removeAttribute(at.name);});const head=parsed.head.innerHTML;
@@ -414,7 +430,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126g', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126h', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -503,7 +519,7 @@ if (!PROJ && navigator.onLine && !BUILD.startsWith('__')) {
 
 /* início */
 if (PROJ) { capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.getElementById('palco').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#17191e;font:600 22px Segoe UI,Arial;text-align:center;padding:30px">Conectando à tela principal…<br><small style="display:block;margin-top:12px;color:#aab0ba;font-size:14px">A demonstração aparecerá aqui automaticamente.</small></div>'; document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); setInterval(()=>{try{window.opener&&window.opener.postMessage({simNeedMirror:true},'*');}catch(e){}},1200); } catch (e) {} }
-else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); atualizarControles(); abrirEtapa(0); }
+else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); atualizarControles(); atualizarOrientacao(); abrirEtapa(0); }
 </script>
 </body>
 </html>
