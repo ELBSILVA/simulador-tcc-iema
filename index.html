@@ -280,8 +280,8 @@ body.principalCheia[data-guia="pc"] #guiaDetalhe{right:10px;bottom:10px;width:ca
 #bGuiaToggle{display:none}
 body.principalCheia #topoProt{gap:10px}
 body.principalCheia #bGuiaToggle{display:inline-block}
-body.principalCheia:not(.guiaAberto) #guiaRapido,body.principalCheia:not(.guiaAberto) #guiaDetalhe{display:none!important}
-body.principalCheia:not(.guiaAberto) #palco{left:0!important;right:0!important;bottom:0!important;top:46px!important}
+body.principalCheia:not(.guiaAberto) #guiaRapido{display:none!important}
+body.principalCheia:not(.guiaAberto):not(.colaAberta) #palco{left:0!important;right:0!important;bottom:0!important;top:46px!important}
 body.principalCheia.guiaAberto #bGuiaToggle{background:#344155;border-color:#64748b}
 /* Navegação e cola independentes, ambas recolhíveis. */
 #bColaToggle{display:none}
@@ -316,6 +316,17 @@ body.principalCheia[data-guia="pc"] #guiaProximos{grid-column:3;grid-row:1 / 3;b
 body.principalCheia[data-guia="pc"].colaAberta:not(.guiaAberto) #palco{bottom:calc(clamp(142px,22vh,210px) + 16px)!important}
 body.principalCheia[data-guia="pc"].guiaAberto.colaAberta #guiaRapido{bottom:calc(clamp(142px,22vh,210px) + 16px)}
 body.principalCheia[data-guia="pc"].guiaAberto.colaAberta #palco{bottom:calc(clamp(142px,22vh,210px) + clamp(105px,17vh,170px) + 24px)!important}
+/* Estado independente e explícito: ocultar botões nunca oculta a cola. */
+body.principalCheia:not(.colaAberta) #guiaDetalhe{display:none!important}
+body.principalCheia.colaAberta[data-guia="cel"] #guiaDetalhe{display:block!important}
+body.principalCheia.colaAberta[data-guia="pc"] #guiaDetalhe{display:grid!important}
+body.principalCheia[data-guia="pc"] #guiaDetalhe>h4{display:block;grid-column:2;grid-row:2;margin:2px 0;color:#a7c8ff}
+body.principalCheia[data-guia="pc"].colaAberta #guiaDetalhe{grid-template-rows:auto auto 1fr}
+body.principalCheia[data-guia="pc"] #guiaAcao{grid-row:3}
+body.principalCheia[data-guia="pc"] #guiaProximos{grid-row:1 / 4}
+body.principalCheia[data-guia="cel"]:not(.guiaAberto).colaAberta #palco{left:0!important;right:calc(clamp(205px,25vw,340px) + 20px)!important}
+body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #palco{left:calc(clamp(205px,25vw,340px) + 20px)!important;right:0!important}
+@media(max-width:800px){body.principalCheia[data-guia="cel"]:not(.guiaAberto).colaAberta #palco,body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #palco{left:0!important;right:0!important;bottom:230px!important}}
 </style>
 </head>
 <body>
@@ -343,7 +354,7 @@ body.principalCheia[data-guia="pc"].guiaAberto.colaAberta #palco{bottom:calc(cla
   </div>
   <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
-<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido" onclick="alternarGuia()">☰ Atalhos</button><button id="bColaToggle" type="button" aria-expanded="false" aria-controls="guiaDetalhe" onclick="definirCola(!document.body.classList.contains('colaAberta'))">▤ Cola das telas</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>O que mostrar</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>O que esta função faz</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>Na demonstração</h4><p id="guiaAcao"></p><div id="guiaProximos"><h4>O que mostrar depois</h4><ol id="guiaPassos"></ol></div></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
+<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido" onclick="alternarGuia()">☰ Botões</button><button id="bColaToggle" type="button" aria-expanded="false" aria-controls="guiaDetalhe" onclick="definirCola(!document.body.classList.contains('colaAberta'))">▤ Cola das telas</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>Botões de navegação rápida</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>Cola da tela atual</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>O que mostrar agora</h4><p id="guiaAcao"></p><div id="guiaProximos"><h4>O que mostrar depois</h4><ol id="guiaPassos"></ol></div></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
 <div id="barraDemonstracao" role="toolbar" aria-label="Controles da demonstração">
  <div class="barraGrupo"><span>Exibição na 2ª tela</span><div class="barraBotoes"><button id="bCapaProjeto" onclick="mostrarCapaProjeto()" disabled>▧ Capa</button><button id="bDemoProjeto" onclick="mostrarDemoProjeto()" disabled>▶ Protótipo</button></div></div>
  <div class="barraGrupo"><span>Orientação da 2ª tela</span><div class="barraBotoes" role="group" aria-label="Orientação da segunda tela"><button type="button" data-orientacao="retrato" aria-pressed="true" onclick="definirOrientacao('retrato')">▯ Retrato</button><button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button></div></div>
@@ -569,7 +580,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126u', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126v', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -631,7 +642,7 @@ document.getElementById('guiaTexto').textContent=extra?.[0]||FALA[key]||FALA[a+'
 document.getElementById('guiaAcao').textContent=extra?.[1]||GUIA_ACAO[key]||(!t?'Escolha um perfil de demonstração usando os botões, sem precisar digitar a senha.':'Mostre os campos e as ações disponíveis nesta tela.');
 preencherPassos(a,m,i,t);requestAnimationFrame(()=>ajustar(false));}
 
-function definirGuia(on){if(PROJ)return;document.body.classList.toggle('guiaAberto',!!on);const b=document.getElementById('bGuiaToggle');b.textContent=on?'✕ Ocultar atalhos':'☰ Atalhos';b.setAttribute('aria-expanded',String(!!on));if(on){guiaAssinatura='';atualizarGuia();}requestAnimationFrame(()=>ajustar(false));}
+function definirGuia(on){if(PROJ)return;document.body.classList.toggle('guiaAberto',!!on);const b=document.getElementById('bGuiaToggle');b.textContent=on?'✕ Ocultar botões':'☰ Botões';b.setAttribute('aria-expanded',String(!!on));if(on){guiaAssinatura='';atualizarGuia();}requestAnimationFrame(()=>ajustar(false));}
 function alternarGuia(){definirGuia(!document.body.classList.contains('guiaAberto'));}
 function definirCola(on,salvar=true){if(PROJ)return;if(salvar){colaPreferida=!!on;try{localStorage.setItem('sim_cola',on?'1':'0');}catch(e){}}document.body.classList.toggle('colaAberta',!!on);const b=document.getElementById('bColaToggle');b.textContent=on?'✕ Ocultar cola':'▤ Cola das telas';b.setAttribute('aria-expanded',String(!!on));if(on){guiaAssinatura='';atualizarGuia();}requestAnimationFrame(()=>ajustar(false));}
 let principalFullNativo=false;
