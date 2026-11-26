@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <title>Simulador – TCC IEMA 2026</title>
 <link rel="icon" href="logo_iema.png">
 <style>
@@ -320,9 +320,9 @@ window.addEventListener('message',e=>{
   if('simCapa' in d){capaNaPlateia(d.simCapa);return;}
   return;
  }
- if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();return;}
+ if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();return;} if(d.simNeedMirror&&projecao&&e.source===projecao){pedirEspelho();return;}
  if(d.ecofood==='abrir'&&e.source===frameDe(chave())&&DISP[d.modo]){executar({cmd:'modo',modo:d.modo});return;}
- if(d.simTela&&e.source===frameDe(chave())){if(projecao&&!projecao.closed)projecao.postMessage({simMirror:{k:chave(),t:d.simTela}},'*');return;}
+ if(d.simTela&&Object.values(criados).some(el=>el?.querySelector('iframe')?.contentWindow===e.source)){const k=Object.keys(criados).find(k=>criados[k]?.querySelector('iframe')?.contentWindow===e.source);if(projecao&&!projecao.closed&&k===chave())projecao.postMessage({simMirror:{k,t:d.simTela}},'*');return;}
  if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){INFO[k]=d.simInfo;if(k===app)avisaControle();} }
 });
 window.addEventListener('resize', () => ajustar(false));
@@ -363,7 +363,7 @@ document.querySelectorAll('.apps button').forEach(b => b.onclick = () => { cmd({
 
 /* Espelho passivo: nenhum aplicativo ou script é executado na segunda janela. */
 let mirrorK=null,mirrorFrame=null,mirrorHead='',mirrorPending=null,mirrorLoading=false;
-function pedirEspelho(){if(PROJ||!projecao||projecao.closed)return;const w=frameDe(chave());if(w)w.postMessage({sim:'espelho',on:true},'*');}
+function pedirEspelho(){if(PROJ||!projecao||projecao.closed)return;let enviados=0;for(const [k,el] of Object.entries(criados)){const w=el?.querySelector('iframe')?.contentWindow;if(w){w.postMessage({sim:'espelho',on:k===chave()},'*');if(k===chave())enviados++;}}if(!enviados)console.warn('Simulador: aplicativo principal ainda não está pronto para espelhamento.');}
 function enviarEstadoPlateia(){if(!projecao||projecao.closed)return;projecao.postMessage({simMeta:estado()},'*');projecao.postMessage({simGeral:geral},'*');projecao.postMessage({simCapa:comCapa},'*');}
 function montarEspelho(k){const el=document.createElement('div');el.className='disp vis '+DISP[k].tipo;el.innerHTML=moldura(k,`<iframe sandbox="allow-same-origin" tabindex="-1" aria-hidden="true" width="${DISP[k].w}" height="${altApp(k)}" style="pointer-events:none"></iframe>`);document.getElementById('palco').replaceChildren(el);for(const j of Object.keys(criados))delete criados[j];criados[k]=el;mirrorK=k;mirrorFrame=el.querySelector('iframe');mirrorHead='';mirrorLoading=false;mirrorPending=null;relogio();requestAnimationFrame(()=>ajustar(false));}
 function aplicarRolagem(doc,t){doc.querySelectorAll('[data-sc],[data-sx]').forEach(el=>{el.scrollTop=Number(el.getAttribute('data-sc'))||0;el.scrollLeft=Number(el.getAttribute('data-sx'))||0;});const root=doc.scrollingElement||doc.documentElement;root.scrollTop=t.sy||0;root.scrollLeft=t.sx||0;}
@@ -383,7 +383,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126b', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); if(!geral)comCapa=false; marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -472,7 +472,7 @@ if (!PROJ && navigator.onLine && !BUILD.startsWith('__')) {
 }
 
 /* início */
-if (PROJ) { capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); } catch (e) {} }
+if (PROJ) { capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.getElementById('palco').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#17191e;font:600 22px Segoe UI,Arial;text-align:center;padding:30px">Conectando à tela principal…<br><small style="display:block;margin-top:12px;color:#aab0ba;font-size:14px">A demonstração aparecerá aqui automaticamente.</small></div>'; document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); setInterval(()=>{try{window.opener&&window.opener.postMessage({simNeedMirror:true},'*');}catch(e){}},1200); } catch (e) {} }
 else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); }
 </script>
 </body>
