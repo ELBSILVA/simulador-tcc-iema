@@ -165,29 +165,40 @@ body.proj #palco .disp{transition:none!important}
 body.proj #palco{left:0;right:0!important}body.proj #abertura{left:0;right:0}
 @media(max-width:1100px){#lado{width:260px}#dir{width:255px}#palco,#apres{left:260px;right:255px!important}#abertura{left:260px;right:255px}}@media(max-width:820px){#lado{width:230px}#dir{width:210px}#palco,#apres{left:230px;right:210px!important}#abertura{left:230px;right:210px}}
 body.proj #palco{left:0!important;right:0!important}body.proj #abertura{left:0!important;right:0!important}
+/* Menu em acordeão: somente uma etapa aberta. */
+#lado .etapa{padding:0;margin:0 0 9px;border:1px solid #354355;border-radius:11px;overflow:hidden;background:#1c2532}
+#lado .etapaHead{width:100%;display:flex;gap:10px;align-items:center;text-align:left;background:transparent;border:0;color:#edf2f8;padding:12px 10px;cursor:pointer}
+#lado .etapaHead:hover{background:#28374a}#lado .etapaHead[aria-expanded="true"]{background:#293b56}
+#lado .etapaHead .num{flex:none;display:grid;place-items:center;width:29px;height:29px;border-radius:8px;background:#344661;color:#b6d3ff;font-size:11px;font-weight:700}
+#lado .etapaNome{flex:1;min-width:0;font-size:13px;font-weight:650}#lado .etapaNome small{display:block;font-weight:400;color:#a4b1c2;font-size:10.5px;line-height:1.4;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lado .chev{font-size:23px;line-height:1;color:#a4b1c2;transition:transform .15s}#lado .etapaHead[aria-expanded="true"] .chev{transform:rotate(90deg)}
+#lado .etapaBody{padding:9px 10px 11px}#lado .etapaBody[hidden]{display:none!important}
+#lado #bAbert{margin-bottom:14px;font-size:12px}#lado .atalhosProj{display:flex;gap:6px;margin-bottom:3px}#lado .atalhosProj button{flex:1;padding:8px 5px;border:1px solid #43536a;background:#253142;color:#edf2f8;border-radius:8px;font-size:11px;cursor:pointer}#lado .atalhosProj button:disabled{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
 <aside id="lado">
-  <div class="topo"><img src="logo_iema.png" alt="IEMA"><div><b>Simulador TCC 2026</b><small>IEMA Pleno Coroatá · Painel do apresentador</small></div></div>
+  <div class="topo"><img src="logo_iema.png" alt="IEMA"><div><b>Simulador TCC 2026</b><small>IEMA Pleno Coroatá · Apresentador</small></div></div>
   <div class="rolo">
-    <section class="etapa"><div class="tit"><span>01</span> Escolher projeto</div>
-    <button id="bAbert" onclick="abertura(true)">⌂ Abertura institucional</button>
-    <div class="apps">
+    <button class="acao" id="bAbert" onclick="abertura(true)">⌂ Voltar à abertura dos três projetos</button>
+    <section class="etapa" data-step="1"><button class="etapaHead" onclick="alternarEtapa(1)" aria-expanded="false"><span class="num">01</span><span class="etapaNome">Escolher projeto<small id="resProjeto">Nenhum selecionado</small></span><span class="chev">›</span></button>
+    <div class="etapaBody" hidden><div class="apps">
       <button data-app="organiza"><img src="Logo_IEMA_Organiza.png" alt=""><div><b>IEMA Organiza</b><small>Grupo 01 · Aplicativo</small></div></button>
       <button data-app="stocktech"><img src="Logo_StockTech.png" alt=""><div><b>StockTech</b><small>Grupo 02 · Sistema</small></div></button>
       <button data-app="ecofood"><img src="Logo_EcoFood.png" alt=""><div><b>EcoFood</b><small>Grupo 03 · Sistema</small></div></button>
-    </div></section>
-    <section class="etapa"><div class="tit"><span>02</span> Projeção</div>
+    </div></div></section>
+    <section class="etapa" data-step="2"><button class="etapaHead" onclick="alternarEtapa(2)" aria-expanded="false"><span class="num">02</span><span class="etapaNome">Projeção<small id="resProj">Segunda tela fechada</small></span><span class="chev">›</span></button>
+    <div class="etapaBody" hidden>
       <div id="projStatus" role="status"><i></i><span>Segunda tela desconectada</span></div>
       <button id="bProj" class="acao prim" onclick="projetar()">▣ Abrir segunda tela</button>
-      <button id="bFull" class="acao" onclick="plateiaCheia()" disabled>⛶ Tela cheia — segunda tela</button>
-      <button id="bTrans" class="acao" onclick="transmitir()" disabled>Exibir protótipo</button>
-    </section>
-    <section class="etapa"><div class="tit"><span>03</span> Perfil de acesso</div><div class="lista" id="perfis"></div></section>
-    <section class="etapa"><div class="tit"><span>04</span> <span id="titTelas">Navegar nas telas</span></div><div class="lista" id="telas"></div></section>
+      <button id="bFull" class="acao" onclick="plateiaCheia();abrirEtapa(3)" disabled>⛶ Tela cheia — segunda tela</button>
+      <button id="bTrans" class="acao" onclick="transmitir();abrirEtapa(3)" disabled>Exibir protótipo</button>
+      <button class="acao" onclick="abrirEtapa(3)">Continuar para perfil ›</button>
+    </div></section>
+    <section class="etapa" data-step="3"><button class="etapaHead" onclick="alternarEtapa(3)" aria-expanded="false"><span class="num">03</span><span class="etapaNome">Perfil de acesso<small id="resPerfil">Escolha um perfil</small></span><span class="chev">›</span></button><div class="etapaBody" hidden><div class="lista" id="perfis"></div></div></section>
+    <section class="etapa" data-step="4"><button class="etapaHead" onclick="alternarEtapa(4)" aria-expanded="false"><span class="num">04</span><span class="etapaNome"><span id="titTelas">Navegar nas telas</span><small id="resTela">Nenhuma tela escolhida</small></span><span class="chev">›</span></button><div class="etapaBody" hidden><div class="lista" id="telas"></div></div></section>
   </div>
-  <div class="base"><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
+  <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
 <main id="palco"></main>
 <section id="apres">
@@ -346,8 +357,12 @@ document.addEventListener('fullscreenchange', () => ajustar(false));
 
 /* ================= CONTROLE: painel lateral ================= */
 let EST = { app, modo, info: null };
-function cmd(c) { if(!PROJ) executar(c); }
-function receber(st) { EST = st; desenharLado(); desenharApres(); document.getElementById('pvCapaLogo').src = LOGO[EST.app]; if(projecao&&!projecao.closed)projecao.postMessage({simMeta:st},'*'); }
+let etapaAtual=0;
+function abrirEtapa(n){if(PROJ)return;etapaAtual=n;document.querySelectorAll('#lado .etapa').forEach(el=>{const on=Number(el.dataset.step)===n;el.querySelector('.etapaHead').setAttribute('aria-expanded',String(on));el.querySelector('.etapaBody').hidden=!on;});}
+function alternarEtapa(n){abrirEtapa(etapaAtual===n?0:n);}
+function atualizarResumoMenu(){if(PROJ)return;const info=EST.info||{},get=id=>document.getElementById(id),ativo=!!(projecao&&!projecao.closed);get('resProjeto').textContent=geral?'Abertura institucional':NOME[EST.app]||'Nenhum selecionado';get('resProj').textContent=ativo?'Segunda tela aberta':'Segunda tela fechada';get('resPerfil').textContent=info.perfil?(info.usuario||info.perfil):'Tela de entrada';get('resTela').textContent=info.tela?((info.menu||[]).find(x=>x[0]===info.tela)?.[2]||info.tela):'Nenhuma tela escolhida';get('atalhoFull').disabled=!ativo;}
+function cmd(c) { if(PROJ)return;executar(c);if(c.cmd==='perfil')abrirEtapa(4);else if(c.cmd==='sair')abrirEtapa(3);else if(c.cmd==='tela')abrirEtapa(0); }
+function receber(st) { const antes=EST?.info?.perfil;EST = st; desenharLado(); desenharApres(); atualizarResumoMenu();if(!PROJ&&!geral&&!antes&&st.info?.perfil&&etapaAtual===3)abrirEtapa(4); document.getElementById('pvCapaLogo').src = LOGO[EST.app]; if(projecao&&!projecao.closed)projecao.postMessage({simMeta:st},'*'); }
 function desenharLado() {
   const { app: a, modo: m, info: i } = EST, emDisp = a === 'ecofood' && m !== 'sistema';
   document.documentElement.style.setProperty('--cor', COR[a]);
@@ -375,7 +390,7 @@ function desenharApres() {
   if (geral) { document.getElementById('aTit').textContent = 'Abertura — TCC IEMA 2026'; document.getElementById('aSub').textContent = 'Logo do IEMA e as logos dos 3 projetos. Escolha o projeto na lateral.'; document.getElementById('aFala').textContent = 'Apresente o TCC: Design Thinking com problemas reais da escola, ligados aos ODS. Hoje, 3 projetos.'; return; }
   if (comCapa && document.body.classList.contains('apresentando')) { document.getElementById('aTit').textContent = `Capa — ${NOME[a]}`; document.getElementById('aSub').textContent = 'Logo do projeto + tempo. O protótipo está pronto por trás.'; }
 }
-document.querySelectorAll('.apps button').forEach(b => b.onclick = () => { cmd({ cmd: 'app', app: b.dataset.app }); if (geral) abertura(false); if(projecao&&!projecao.closed){comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();} });
+document.querySelectorAll('.apps button').forEach(b => b.onclick = () => escolher(b.dataset.app));
 
 /* Espelho passivo: nenhum aplicativo ou script é executado na segunda janela. */
 let mirrorK=null,mirrorFrame=null,mirrorHead='',mirrorPending=null,mirrorLoading=false;
@@ -399,7 +414,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126c', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126d', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); if(!geral)comCapa=false; marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -417,7 +432,7 @@ function entrarTelaCheia() { if (!PROJ) return; if (!document.fullscreenElement 
 function cheia() { plateiaCheia(); }
 
 /* tela cheia na plateia: pedido pelo apresentador (delegação) ou no 1º clique na janela da plateia */
-function atualizarControles(){const ativo=!!(projecao&&!projecao.closed), b=document.getElementById('bProj'),full=document.getElementById('bFull'),trans=document.getElementById('bTrans'),status=document.getElementById('projStatus');if(!b||!full||!trans||!status)return;b.textContent=ativo?'■ Encerrar projeção':'▣ Abrir segunda tela';b.classList.toggle('ativo',ativo);b.classList.toggle('prim',!ativo);full.disabled=!ativo;trans.disabled=!ativo||geral;trans.textContent=comCapa?'▶ Exibir protótipo':'▧ Exibir capa do projeto';status.classList.toggle('live',ativo);status.querySelector('span').textContent=ativo?'Segunda tela aberta':'Segunda tela desconectada';}
+function atualizarControles(){const ativo=!!(projecao&&!projecao.closed), b=document.getElementById('bProj'),full=document.getElementById('bFull'),trans=document.getElementById('bTrans'),status=document.getElementById('projStatus');if(!b||!full||!trans||!status)return;b.textContent=ativo?'■ Encerrar projeção':'▣ Abrir segunda tela';b.classList.toggle('ativo',ativo);b.classList.toggle('prim',!ativo);full.disabled=!ativo;trans.disabled=!ativo||geral;trans.textContent=comCapa?'▶ Exibir protótipo':'▧ Exibir capa do projeto';status.classList.toggle('live',ativo);status.querySelector('span').textContent=ativo?'Segunda tela aberta':'Segunda tela desconectada';atualizarResumoMenu();}
 function plateiaCheia(){if(!projecao||projecao.closed)return;try{projecao.focus();projecao.postMessage({simCheia:true},{targetOrigin:'*',delegate:'fullscreen'});}catch(e){try{projecao.postMessage({simCheia:true},'*');}catch(_) {}}}
 /* abertura (antes de escolher o projeto) */
 var geral = true;
@@ -426,10 +441,10 @@ function aberturaVisual(on) { const a = document.getElementById('abertura'); cle
   if (on) { document.body.classList.add('geral'); a.offsetWidth; a.classList.remove('saindo'); }
   else { a.classList.add('saindo'); abT = setTimeout(() => { document.body.classList.remove('geral'); a.classList.remove('saindo'); }, 900); }
   const b = document.getElementById('bAbert'); if (b) b.classList.toggle('on', on); }
-function abertura(on) { geral = on; if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
+function abertura(on) { geral = on;if(on&&!PROJ)abrirEtapa(1); if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
   if (projecao && !projecao.closed) { projecao.postMessage({ simGeral: on }, '*'); aberturaVisual(on); document.getElementById('bAbert').classList.toggle('on', on); desenharApres(); }
   else aberturaVisual(on); }
-function escolher(a) { if (PROJ) return; cmd({ cmd: 'app', app: a }); abertura(false); if(projecao&&!projecao.closed){comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();} }
+function escolher(a) { if (PROJ) return; cmd({ cmd: 'app', app: a }); abertura(false); if(projecao&&!projecao.closed){comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();} atualizarResumoMenu();abrirEtapa(2); }
 
 /* capa x protótipo na plateia */
 function transmitir() { comCapa = !comCapa; marcaCapa(); if (projecao && !projecao.closed) {projecao.postMessage({ simCapa: comCapa }, '*');pedirEspelho();} }
@@ -487,7 +502,7 @@ if (!PROJ && navigator.onLine && !BUILD.startsWith('__')) {
 
 /* início */
 if (PROJ) { capaPlateia(); document.body.classList.add('comCapa'); document.body.classList.add('geral'); document.getElementById('palco').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:#17191e;font:600 22px Segoe UI,Arial;text-align:center;padding:30px">Conectando à tela principal…<br><small style="display:block;margin-top:12px;color:#aab0ba;font-size:14px">A demonstração aparecerá aqui automaticamente.</small></div>'; document.addEventListener('pointerdown',()=>entrarTelaCheia()); document.addEventListener('keydown',e=>{if(e.key==='F11')return;if(e.key==='Enter')entrarTelaCheia();}); try { window.opener && window.opener.postMessage({ simPronta: true }, '*'); setInterval(()=>{try{window.opener&&window.opener.postMessage({simNeedMirror:true},'*');}catch(e){}},1200); } catch (e) {} }
-else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); atualizarControles(); }
+else { try { const s = localStorage.getItem('simulador_app'); if (DISP[s]) app = s; } catch (e) {} EST.app = app; mostrarPalco(); desenharLado(); cronoMostra(); aberturaVisual(true); atualizarControles(); abrirEtapa(0); }
 </script>
 </body>
 </html>
