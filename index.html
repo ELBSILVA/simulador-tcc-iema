@@ -361,7 +361,7 @@ let etapaAtual=0;
 function abrirEtapa(n){if(PROJ)return;etapaAtual=n;document.querySelectorAll('#lado .etapa').forEach(el=>{const on=Number(el.dataset.step)===n;el.querySelector('.etapaHead').setAttribute('aria-expanded',String(on));el.querySelector('.etapaBody').hidden=!on;});}
 function alternarEtapa(n){abrirEtapa(etapaAtual===n?0:n);}
 function atualizarResumoMenu(){if(PROJ)return;const info=EST.info||{},get=id=>document.getElementById(id),ativo=!!(projecao&&!projecao.closed);get('resProjeto').textContent=geral?'Abertura institucional':NOME[EST.app]||'Nenhum selecionado';get('resProj').textContent=ativo?'Segunda tela aberta':'Segunda tela fechada';get('resPerfil').textContent=info.perfil?(info.usuario||info.perfil):'Tela de entrada';get('resTela').textContent=info.tela?((info.menu||[]).find(x=>x[0]===info.tela)?.[2]||info.tela):'Nenhuma tela escolhida';get('atalhoFull').disabled=!ativo;}
-function cmd(c) { if(PROJ)return;executar(c);if(c.cmd==='perfil')abrirEtapa(4);else if(c.cmd==='sair')abrirEtapa(3);else if(c.cmd==='tela')abrirEtapa(0); }
+function cmd(c) { if(PROJ)return;executar(c);if(c.cmd==='perfil')abrirEtapa(4);else if(c.cmd==='sair')abrirEtapa(3);else if(c.cmd==='tela')abrirEtapa(4); }
 function receber(st) { const antes=EST?.info?.perfil;EST = st; desenharLado(); desenharApres(); atualizarResumoMenu();if(!PROJ&&!geral&&!antes&&st.info?.perfil&&etapaAtual===3)abrirEtapa(4); document.getElementById('pvCapaLogo').src = LOGO[EST.app]; if(projecao&&!projecao.closed)projecao.postMessage({simMeta:st},'*'); }
 function desenharLado() {
   const { app: a, modo: m, info: i } = EST, emDisp = a === 'ecofood' && m !== 'sistema';
@@ -414,7 +414,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen,left=${outra.availLeft},top=${outra.availTop},width=${outra.availWidth},height=${outra.availHeight}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126d', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126e', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); if(!geral)comCapa=false; marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
