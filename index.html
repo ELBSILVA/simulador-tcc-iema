@@ -327,6 +327,10 @@ body.principalCheia[data-guia="pc"] #guiaProximos{grid-row:1 / 4}
 body.principalCheia[data-guia="cel"]:not(.guiaAberto).colaAberta #palco{left:0!important;right:calc(clamp(205px,25vw,340px) + 20px)!important}
 body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #palco{left:calc(clamp(205px,25vw,340px) + 20px)!important;right:0!important}
 @media(max-width:800px){body.principalCheia[data-guia="cel"]:not(.guiaAberto).colaAberta #palco,body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #palco{left:0!important;right:0!important;bottom:230px!important}}
+#guiaPassos{list-style:none;padding:0;margin:5px 0;display:grid;gap:5px}
+#guiaPassos .passoBtn{width:100%;display:block;text-align:left;cursor:pointer;background:#253950;color:#eaf3ff;border:1px solid #506f96;border-radius:6px;font:600 12px/1.3 Segoe UI,Arial;padding:7px 9px;user-select:none;white-space:normal}
+#guiaPassos .passoBtn:hover,#guiaPassos .passoBtn:focus-visible{background:#3179df;color:#fff;outline-offset:2px}
+body.principalCheia[data-guia="pc"] #guiaProximos{overflow:auto}
 </style>
 </head>
 <body>
@@ -354,7 +358,7 @@ body.principalCheia[data-guia="cel"].guiaAberto:not(.colaAberta) #palco{left:cal
   </div>
   <div class="base"><div class="atalhosProj"><button id="atalhoProj" onclick="abrirEtapa(2)" title="Controles da projeção">▣ Projeção</button><button id="atalhoFull" onclick="plateiaCheia()" disabled title="Tela cheia somente na segunda tela">⛶ Tela cheia</button></div><button class="acao" onclick="cmd({cmd:'recarregar'})">↻ Recarregar aplicativo</button><div class="ver">F8 encerra · senha de teste 1234 · <span id="ver"></span></div></div>
 </aside>
-<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido" onclick="alternarGuia()">☰ Botões</button><button id="bColaToggle" type="button" aria-expanded="false" aria-controls="guiaDetalhe" onclick="definirCola(!document.body.classList.contains('colaAberta'))">▤ Cola das telas</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>Botões de navegação rápida</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>Cola da tela atual</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>O que mostrar agora</h4><p id="guiaAcao"></p><div id="guiaProximos"><h4>O que mostrar depois</h4><ol id="guiaPassos"></ol></div></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
+<div id="topoProt"><button id="bCheiaPrincipal" type="button" onclick="cheiaPrincipal()" disabled>⛶ Tela cheia</button><button id="bGuiaToggle" type="button" aria-expanded="false" aria-controls="guiaRapido" onclick="alternarGuia()">☰ Botões</button><button id="bColaToggle" type="button" aria-expanded="false" aria-controls="guiaDetalhe" onclick="definirCola(!document.body.classList.contains('colaAberta'))">▤ Cola das telas</button><button id="bVoltarMenu" type="button" onclick="voltarMenuPrincipal()">← Voltar para o menu</button></div><main id="palco"></main><aside id="guiaRapido" aria-label="Roteiro e navegação rápida"><h3>Botões de navegação rápida</h3><div id="guiaPerfis"></div><div id="guiaTelas"></div></aside><aside id="guiaDetalhe" aria-live="polite"><h3>Cola da tela atual</h3><div id="guiaTitulo"></div><p id="guiaTexto"></p><h4>O que mostrar agora</h4><p id="guiaAcao"></p><div id="guiaProximos"><h4>Próximos passos — clique para abrir</h4><ol id="guiaPassos"></ol></div></aside><div id="ajudaCheia" hidden><div class="fsCard"><strong>Preparar segunda tela</strong><p>Ative a tela cheia para ocultar a barra de endereços e os menus do navegador.</p><button type="button" onclick="entrarTelaCheia(true)">⛶ Entrar em tela cheia</button><small>Se necessário, pressione F11 nesta janela.</small></div></div>
 <div id="barraDemonstracao" role="toolbar" aria-label="Controles da demonstração">
  <div class="barraGrupo"><span>Exibição na 2ª tela</span><div class="barraBotoes"><button id="bCapaProjeto" onclick="mostrarCapaProjeto()" disabled>▧ Capa</button><button id="bDemoProjeto" onclick="mostrarDemoProjeto()" disabled>▶ Protótipo</button></div></div>
  <div class="barraGrupo"><span>Orientação da 2ª tela</span><div class="barraBotoes" role="group" aria-label="Orientação da segunda tela"><button type="button" data-orientacao="retrato" aria-pressed="true" onclick="definirOrientacao('retrato')">▯ Retrato</button><button type="button" data-orientacao="paisagem" aria-pressed="false" onclick="definirOrientacao('paisagem')">▭ Paisagem</button></div></div>
@@ -515,7 +519,7 @@ window.addEventListener('message',e=>{
  if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();plateiaCheia();return;} if(d.simNeedMirror&&projecao&&e.source===projecao){pedirEspelho();return;} if(typeof d.simFullStatus==='boolean'&&projecao&&e.source===projecao){const s=document.querySelector('#projStatus span');if(s)s.textContent=d.simFullStatus?'Segunda tela em tela cheia':'Segunda tela aberta · ativar tela cheia';return;}
  if(d.ecofood==='abrir'&&e.source===frameDe(chave())&&DISP[d.modo]){executar({cmd:'modo',modo:d.modo});return;}
  if(d.simTela&&Object.values(criados).some(el=>el?.querySelector('iframe')?.contentWindow===e.source)){const k=Object.keys(criados).find(k=>criados[k]?.querySelector('iframe')?.contentWindow===e.source);if(projecao&&!projecao.closed&&k===chave())projecao.postMessage({simMirror:{k,t:d.simTela}},'*');return;}
- if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){INFO[k]=d.simInfo;if(k===app)avisaControle();} }
+ if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){INFO[k]=d.simInfo;if(k===app){avisaControle();completarPasso(k,d.simInfo);}} }
 });
 window.addEventListener('resize', () => {dimensionarProjecao();ajustar(false);});
 document.addEventListener('fullscreenchange', () => {dimensionarProjecao();ajustar(false);});
@@ -580,7 +584,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261126v', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261127a', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -626,7 +630,13 @@ stocktech:[['cozinha','painel','Cozinha: indicadores do estoque'],['cozinha','en
 ecofood:[['pdv','pdv','PDV: leitura da carteirinha'],['cozinha','cozinha','Cozinha: refeições e repetição'],['cozinha','cardapio','Cardápio e fotos'],['cozinha','pesagem','Registro das sobras'],['gestao','desperdicio','Desperdício por turma'],['gestao','relatorios','Gestão: indicadores'],['gestao','win:totem','Totem do refeitório'],['gestao','win:tablet','Tablet de avaliação'],['gestao','win:mural','Mural do ranking']]
 };
 let colaPreferida=true;try{colaPreferida=localStorage.getItem('sim_cola')!=='0';}catch(e){}
-function preencherPassos(a,m,i,t){const ol=document.getElementById('guiaPassos');ol.replaceChildren();const seq=ROTEIRO_DEMO[a]||[];let idx=seq.findIndex(p=>m!=='sistema'?p[1]==='win:'+m:p[0]===i?.perfil&&p[1]===t);const proximos=seq.slice(idx+1,idx+4);ol.start=idx+2;if(!proximos.length){const li=document.createElement('li');li.textContent='Conclua destacando os benefícios do projeto e abra espaço para perguntas.';ol.append(li);return;}for(const p of proximos){const li=document.createElement('li');li.textContent=p[2];ol.append(li);}}
+let passoPendente=null;
+function abrirPasso(a,p){if(PROJ||a!==app)return;passoPendente=null;const [perfil,destino]=p;if(destino.startsWith('win:')){cmd({cmd:'modo',modo:destino.slice(4)});return;}
+if(INFO[a]?.perfil===perfil){cmd({cmd:'tela',tela:destino});return;}
+passoPendente={a,perfil,destino};cmd({cmd:'perfil',perfil});}
+function completarPasso(a,info){const p=passoPendente;if(!p||p.a!==a||a!==app)return;if(info?.perfil!==p.perfil)return;passoPendente=null;cmd({cmd:'tela',tela:p.destino});}
+function preencherPassos(a,m,i,t){const ol=document.getElementById('guiaPassos');ol.replaceChildren();const seq=ROTEIRO_DEMO[a]||[];let idx=seq.findIndex(p=>m!=='sistema'?p[1]==='win:'+m:p[0]===i?.perfil&&p[1]===t);const proximos=seq.slice(idx+1,idx+4);ol.start=idx+2;if(!proximos.length){const li=document.createElement('li');li.textContent='Conclua destacando os benefícios do projeto e abra espaço para perguntas.';ol.append(li);return;}for(const [j,p] of proximos.entries()){const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='passoBtn';b.textContent=(idx+2+j)+'. '+p[2]+' →';b.title='Ir diretamente para '+p[2];b.onclick=()=>abrirPasso(a,p);li.append(b);ol.append(li);}}
+
 let guiaAssinatura='';
 function atualizarGuia(){if(PROJ||!document.body.classList.contains('principalCheia'))return;const {app:a,modo:m,info:i}=EST;document.body.dataset.guia=retrato(chave())?'cel':'pc';const emDisp=a==='ecofood'&&m!=='sistema',t=emDisp?m:(i?.tela||''),nav=i?.menu||[],perfis=i?.perfis||[];const sig=JSON.stringify([a,m,i?.perfil,t,nav,perfis]);if(sig===guiaAssinatura)return;guiaAssinatura=sig;
 const P=document.getElementById('guiaPerfis'),T=document.getElementById('guiaTelas');P.replaceChildren();T.replaceChildren();
@@ -664,7 +674,7 @@ function aberturaVisual(on) { const a = document.getElementById('abertura'); cle
 function abertura(on) { geral = on;if(on&&!PROJ)abrirEtapa(1); if (on) { comCapa = true; marcaCapa(); if (projecao && !projecao.closed) projecao.postMessage({ simCapa: true }, '*'); }
   if (projecao && !projecao.closed) { projecao.postMessage({ simGeral: on }, '*'); aberturaVisual(on); document.getElementById('bAbert').classList.toggle('on', on); desenharApres(); }
   else aberturaVisual(on); }
-function escolher(a) { if(PROJ||!NOME[a])return;geral=false;comCapa=true;definirOrientacao(a==='organiza'?'retrato':'paisagem');cmd({cmd:'app',app:a});aberturaVisual(false);marcaCapa();enviarEstadoPlateia();pedirEspelho();atualizarResumoMenu();abrirEtapa(projecao&&!projecao.closed?3:2); }
+function escolher(a) { if(PROJ||!NOME[a])return;passoPendente=null;geral=false;comCapa=true;definirOrientacao(a==='organiza'?'retrato':'paisagem');cmd({cmd:'app',app:a});aberturaVisual(false);marcaCapa();enviarEstadoPlateia();pedirEspelho();atualizarResumoMenu();abrirEtapa(projecao&&!projecao.closed?3:2); }
 function mostrarCapaProjeto(){if(PROJ||geral)return;comCapa=true;marcaCapa();enviarEstadoPlateia();}
 function mostrarDemoProjeto(){if(PROJ||geral)return;comCapa=false;marcaCapa();enviarEstadoPlateia();pedirEspelho();if(etapaAtual!==4)abrirEtapa(3);}
 function alternarDemonstracao(){if(comCapa)mostrarDemoProjeto();else mostrarCapaProjeto();}
