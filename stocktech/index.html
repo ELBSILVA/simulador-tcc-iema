@@ -734,6 +734,7 @@ if (me()) setTimeout(() => avisarAlertas(false), 1800);
       if (d.sim === 'perfil') { const u = DB.users.find(x => x.perfil === d.perfil); if (u) { DB.sessao = null; entrar(u.login, u.senha); } }
       if (d.sim === 'sair') sair();
       if (d.sim === 'ir' && me()) { if (String(d.tela).startsWith('win:')) abrirJanela(d.tela.slice(4)); else ir(d.tela); }
+      if(d.sim==='funcao'&&me()){let dest=d.tela,p=d.param??null;if(dest==='alimento'){const x=DB.alimentos[0];if(x)p=x.id;else dest='alimentos';}if(dest==='saidaRapida'){saidaRapida();dest=null;}if(dest)ir(dest,p);}
     } catch (err) {}
     ult = ''; envia(); });
 })();
