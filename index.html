@@ -461,7 +461,7 @@ function moldura(k, miolo) {
   const d = DISP[k];
   return `<div class="moldura"><div class="tela" style="width:${d.w}px;height:${d.h}px">${d.tipo==='cel'?'<div class="sb"><span class="hr"></span><div class="ilha"></div><span class="ic">▂▄▆ <span class="bat"><i></i></span></span></div>':''}${miolo}</div></div>${d.tipo==='mon'?'<div class="pe"></div><div class="base"></div>':''}`;
 }
-const fonte = k => { const [u, h] = DISP[k].src.split('#'); return location.protocol.startsWith('http') ? u + '?v=' + Math.floor(Date.now() / 60000) + (h ? '#' + h : '') : DISP[k].src; };
+const fonte = k => { const [u, h] = DISP[k].src.split('#'); return location.protocol.startsWith('http') ? u + '?v=20261127g-' + Math.floor(Date.now() / 60000) + (h ? '#' + h : '') : DISP[k].src; };
 const altApp = k => DISP[k].tipo === 'cel' ? DISP[k].h - 40 : DISP[k].h;
 function criar(k) {
   const d = DISP[k], el = document.createElement('div');
@@ -528,7 +528,7 @@ window.addEventListener('message',e=>{
  if(d.simPronta&&projecao&&e.source===projecao){enviarEstadoPlateia();pedirEspelho();cronoMostra();plateiaCheia();return;} if(d.simNeedMirror&&projecao&&e.source===projecao){pedirEspelho();return;} if(typeof d.simFullStatus==='boolean'&&projecao&&e.source===projecao){const s=document.querySelector('#projStatus span');if(s)s.textContent=d.simFullStatus?'Segunda tela em tela cheia':'Segunda tela aberta · ativar tela cheia';return;}
  if(d.ecofood==='abrir'&&e.source===frameDe(chave())&&DISP[d.modo]){executar({cmd:'modo',modo:d.modo});return;}
  if(d.simTela&&Object.values(criados).some(el=>el?.querySelector('iframe')?.contentWindow===e.source)){const k=Object.keys(criados).find(k=>criados[k]?.querySelector('iframe')?.contentWindow===e.source);if(projecao&&!projecao.closed&&k===chave())projecao.postMessage({simMirror:{k,t:d.simTela}},'*');return;}
- if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){INFO[k]=d.simInfo;if(k===app){avisaControle();completarPasso(k,d.simInfo);completarFuncao(k,d.simInfo);}} }
+ if(d.simInfo){for(const k of ['organiza','stocktech','ecofood'])if(e.source===frameDe(k)){if(k==='organiza'&&Array.isArray(d.simInfo.menu))d.simInfo.menu=d.simInfo.menu.filter(n=>n[0]!=='localizarProfessor');INFO[k]=d.simInfo;if(k===app){avisaControle();completarPasso(k,d.simInfo);completarFuncao(k,d.simInfo);}} }
 });
 window.addEventListener('resize', () => {dimensionarProjecao();ajustar(false);});
 document.addEventListener('fullscreenchange', () => {dimensionarProjecao();ajustar(false);});
@@ -593,7 +593,7 @@ async function projetar() {
     if ('getScreenDetails' in window) { const sd = await window.getScreenDetails(); const outra = sd.screens.find(s => s !== sd.currentScreen);
       if (outra) feat = `popup,fullscreen=yes,left=${outra.left},top=${outra.top},width=${outra.width},height=${outra.height}`; }
   } catch (e) {}
-  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261127f', 'tcc_projecao', feat);
+  projecao = window.open(location.href.split('?')[0].split('#')[0] + '?projecao&v=20261127g', 'tcc_projecao', feat);
   if (!projecao) { alert('O navegador bloqueou a janela. Permita pop-ups para este arquivo e tente de novo.'); return; }
   // O palco principal permanece ativo; a plateia não executa aplicativos.
   document.body.classList.add('apresentando'); marcaCapa(); mostrarPalco(); enviarEstadoPlateia(); pedirEspelho();
@@ -615,7 +615,6 @@ function atualizarAjudaCheia(){if(!PROJ)return;const ativo=navegadorEmTelaCheia(
 function cheia() { plateiaCheia(); }
 const GUIA_EXTRA={
 'organiza:horarioGeral':['Consulta todos os horários das turmas, com disciplina, professor previsto e substituições.','Escolha uma data e turma ou horário; mostre qual professor deve dar aula em cada turma.'],
-'organiza:localizarProfessor':['Localiza a turma prevista de um professor pela grade e pelas substituições.','Selecione o professor e mostre a aula atual prevista e a próxima aula.'],
 'organiza:material':['Disponibiliza materiais de estudo por turma.','Mostre o cadastro de título, link e turma destinatária.'],
 'organiza:ajustes':['Reúne as configurações e dados do usuário.','Mostre as opções disponíveis no perfil atual.'],
 'stocktech:alimentos':['Consulta e cadastro de alimentos do estoque.','Abra um alimento e mostre os dados disponíveis.'],
