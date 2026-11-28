@@ -636,7 +636,7 @@ function render() {
   if (modo === 'mural') return renderMuralCheio();
   if (!DB.sessao || !me()) return renderLogin();
   const u = me(); const nav = NAVS[u.perfil];
-  if (!TELAS[tela] || !nav.some(n => n[0] === tela) && !['aluno','novoAluno','editCard','novoCard','prato'].includes(tela)) tela = telaInicial(u.perfil);
+  if (!TELAS[tela] || !nav.some(n => n[0] === tela) && !['aluno','novoAluno','editCard','novoCard','prato','janelas'].includes(tela)) tela = telaInicial(u.perfil);
   $('#app').innerHTML = `<div class="top"><div class="brand">${ICON}<div><b><span style="color:var(--b)">Eco</span><span style="color:var(--r)">Food</span></b><small>PROJETO DESPERDÍCIO ZERO • IEMA</small></div></div>
    <div class="row" style="margin-left:auto;gap:10px"><span class="sub" style="text-align:right">${esc(u.nome)}<br><b>${DIASF[hoje().getDay()]}, ${br(iso(hoje()))}</b></span>
    ${btnCheia()}<div class="av" title="Trocar usuário" onclick="menuUser()">${esc(iniciais(u.nome))}</div></div></div>
@@ -1156,6 +1156,7 @@ window.addEventListener('hashchange', () => render());
       if (d.sim === 'perfil') { const u = DB.users.find(x => x.perfil === d.perfil); if (u) { DB.sessao = null; entrar(u.login, u.senha); } }
       if (d.sim === 'sair') sair();
       if (d.sim === 'ir' && me()) { if (String(d.tela).startsWith('win:')) abrirJanela(d.tela.slice(4)); else ir(d.tela); }
+      if(d.sim==='funcao'&&me()){let dest=d.tela,p=d.param??null;if(dest==='editCard'){p=Object.keys(DB.cardapio)[0];if(!p)dest='cardapio';}if(dest==='janelas'&&!NAVS[me().perfil].some(x=>x[0]==='janelas'))dest='pdv';if(dest)ir(dest,p);}
     } catch (err) {}
     ult = ''; envia(); });
 })();
