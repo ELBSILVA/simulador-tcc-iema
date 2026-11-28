@@ -852,7 +852,7 @@ if (me() && me().perfil === 'aluno') setTimeout(() => verificarLembretes(me(), f
       if (d.sim === 'perfil') { const u = DB.users.find(x => x.perfil === d.perfil); if (u) { DB.sessao = null; entrar(u.login, u.senha); } }
       if (d.sim === 'sair') sair();
       if (d.sim === 'ir' && me()) { if (String(d.tela).startsWith('win:')) abrirJanela(d.tela.slice(4)); else ir(d.tela); }
-      if(d.sim==='funcao'&&me()){let dest=d.tela,p=d.param??null;if(dest==='ativ'){const u=me();const x=u.perfil==='aluno'?minhasAtiv(u)[0]:DB.atividades.find(x=>u.perfil==='coord'||x.profId===u.id);if(x)p=x.id;else dest=u.perfil==='aluno'?'trabalhos':u.perfil==='coord'?'todas':'minhas';}if(dest==='horarioAluno'){const x=DB.users.find(x=>x.perfil==='aluno');if(x)p={id:x.id,m:'semana',d:1};else dest='usuarios';}if(dest)ir(dest,p);}
+      if(d.sim==='funcao'&&me()){let dest=d.tela,p=d.param??null;if(dest==='ativ'){const u=me();const x=u.perfil==='aluno'?minhasAtiv(u)[0]:DB.atividades.find(x=>u.perfil==='coord'||x.profId===u.id);if(x)p=x.id;else dest=u.perfil==='aluno'?'trabalhos':u.perfil==='coord'?'todas':'minhas';}if(dest==='horarioAluno'||dest==='horarioProfessor'){const perfil=dest==='horarioAluno'?'aluno':'professor';const x=DB.users.find(x=>x.perfil===perfil);if(x)p={id:x.id,m:perfil==='aluno'?'semana':'dia',d:1};else{dest='usuarios';p=perfil;}}if(dest)ir(dest,p);}
     } catch (err) {}
     ult = ''; envia(); });
 })();
